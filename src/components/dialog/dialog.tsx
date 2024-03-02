@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Button from '../button/button';
-import useFocusTrap from '@/lib/hooks/use-focustrap';
-import { createPortal } from 'react-dom';
-import useIsMounted from '@/lib/hooks/use-is-mounted';
-import DialogContext from '@/context/dialog-context-provider';
-import { AnimatePresence, Variant } from 'framer-motion';
-import DialogInner from './dialog-inner';
-import DialogContent from './dialog-content';
-import DialogOverlay from './dialog-overlay';
-import DialogHeader from './dialog-header';
-import DialogBody from './dialog-body';
-import DialogFooter from './dialog-footer';
-import DialogTitle from './dialog-title';
+import React from "react";
+import Button from "../button/button";
+import useFocusTrap from "@/lib/hooks/use-focustrap";
+import { createPortal } from "react-dom";
+import useIsMounted from "@/lib/hooks/use-is-mounted";
+import DialogContext from "@/context/dialog-context-provider";
+import { AnimatePresence, Variant } from "framer-motion";
+import DialogInner from "./dialog-inner";
+import DialogContent from "./dialog-content";
+import DialogOverlay from "./dialog-overlay";
+import DialogHeader from "./dialog-header";
+import DialogBody from "./dialog-body";
+import DialogFooter from "./dialog-footer";
+import DialogTitle from "./dialog-title";
 
 export default function Example1() {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
@@ -23,30 +23,31 @@ export default function Example1() {
 
   return (
     <>
-      <Button size='lg' onClick={handleOpen}>Open Modal 1</Button>
+      <Button size="lg" onClick={handleOpen}>
+        Open Modal 1
+      </Button>
 
       <Dialog isOpen={isOpen} onHide={handleClose}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Dialog Title 1</DialogTitle>
 
-            <Button variant={'ghost'} onClick={handleClose}>&times;</Button>
+            <Button variant={"ghost"} onClick={handleClose}>
+              &times;
+            </Button>
           </DialogHeader>
 
-          <DialogBody>
-            body
-          </DialogBody>
+          <DialogBody>body</DialogBody>
 
           <DialogFooter>
-            <Button variant={'destructive'}>Cancel</Button>
-            <Button variant={'primary'}>Save</Button>
+            <Button variant={"destructive"}>Cancel</Button>
+            <Button variant={"primary"}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
   );
 }
-
 
 type DialogProps = {
   children: React.ReactNode;
@@ -62,7 +63,7 @@ type DialogProps = {
   /**
    * Include a backdrop component. Use 'static' to create a backdrop that doesn't trigger an "onHide" event when clicked.
    */
-  backdrop?: 'static' | boolean;
+  backdrop?: "static" | boolean;
   /**
    * Applies a blurring effect to the backdrop.
    */
@@ -72,10 +73,6 @@ type DialogProps = {
    */
   backdropClassName?: string;
   /**
-   * Apply an optional additional class name to the <DialogContent>.
-   */
-  contentClassName?: string;
-  /**
    * Close the dialog when the escape key is pressed.
    */
   keyboard?: boolean;
@@ -84,7 +81,7 @@ type DialogProps = {
    */
   scrollable?: boolean;
   /**
-   * 
+   *
    */
   animation?: boolean | Variant;
   /**
@@ -94,11 +91,11 @@ type DialogProps = {
   /**
    * Render a dialog in large, extra-large, or small sizes. If not specified, the dialog defaults to medium size.
    */
-  size?: 'default' | 'sm' | 'lg' | 'xl';
+  size?: "default" | "sm" | "lg" | "xl";
   /**
    * Render a fullscreen dialog. If a breakpoint is specified, the dialog will be fullscreen below that breakpoint size.
    */
-  fullscreen?: 'default' | 'sm' | 'md' | 'lg' | 'xl';
+  fullscreen?: "default" | "sm" | "md" | "lg" | "xl";
   /**
    * Vertically center the dialog in the window.
    */
@@ -123,27 +120,34 @@ function Dialog({ children, isOpen, onHide, ...props }: DialogProps) {
 
   // event handlers / actions
   const onEscapeDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Escape') return;
+    if (event.key !== "Escape") return;
 
     onHide();
   };
 
-  return isMounted && createPortal(
-    <DialogContext.Provider value={{}}>
-      <AnimatePresence>
-        {
-          isOpen &&
-
-          <DialogOverlay>
-            <div ref={dialogRef} {...props} role={'dialog'} aria-modal={true} onKeyDown={onEscapeDown} className='fixed top-0 left-0 z-[1055] w-full h-full overflow-x-hidden overflow-y-auto outline-0' tabIndex={-1}>
-              <DialogInner>
-                {children}
-              </DialogInner>
-            </div>
-          </DialogOverlay>
-        }
-      </AnimatePresence>
-    </DialogContext.Provider>,
-    document.body
+  return (
+    isMounted &&
+    createPortal(
+      <DialogContext.Provider value={{}}>
+        <AnimatePresence>
+          {isOpen && (
+            <DialogOverlay>
+              <div
+                ref={dialogRef}
+                {...props}
+                role={"dialog"}
+                aria-modal={true}
+                onKeyDown={onEscapeDown}
+                className="fixed top-0 left-0 z-[1055] w-full h-full overflow-x-hidden overflow-y-auto outline-0"
+                tabIndex={-1}
+              >
+                <DialogInner>{children}</DialogInner>
+              </div>
+            </DialogOverlay>
+          )}
+        </AnimatePresence>
+      </DialogContext.Provider>,
+      document.body
+    )
   );
 }
