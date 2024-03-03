@@ -5,9 +5,9 @@ import React from "react";
  * @returns isMounted
  */
 export default function useIsMounted() {
-	const [isMouted, setIsMounted] = React.useState<boolean>(false);
+  const [isMouted, setIsMounted] = React.useState<boolean>(false);
 
-	React.useEffect(() => setIsMounted(true), []);
+  React.useEffect(() => setIsMounted(true), []);
 
-	return isMouted;
+  return isMouted;
 }
