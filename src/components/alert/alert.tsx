@@ -7,19 +7,20 @@ import Button from "../button/button";
 import {
   AnimatePresence,
   AnimationProps,
+  Transition,
   Variants,
   motion,
 } from "framer-motion";
 
 const AlertAnimation = {
   initial: {
-    opacity: 1,
+    opacity: 0,
   },
   animate: {
     opacity: 1,
   },
   exit: {
-    opacity: 1,
+    opacity: 0,
   },
 };
 
@@ -30,7 +31,7 @@ export function AlertExample1() {
     <>
       <Button onClick={() => setIsOpen((prev) => !prev)}>Open alert</Button>
 
-      <Alert show={isOpen} animation={false}>
+      <Alert show={isOpen} animation={AlertAnimation}>
         <AlertTitle>Heads up!</AlertTitle>
         <AlertDescription>
           You can add <AlertLink>components</AlertLink> to your app using the
@@ -56,11 +57,14 @@ const AlertVariants = cva(
   }
 );
 
+type Animation = Omit<AnimationProps, "variants" | "transition">;
+
 type AlertProps = VariantProps<typeof AlertVariants> & {
   children: React.ReactNode;
   reference?: React.RefObject<HTMLDivElement>;
   show?: boolean;
-  animation?: false | AnimationProps;
+  animation?: false | Animation;
+  transition?: Transition;
   className?: string;
 };
 
@@ -70,6 +74,7 @@ export default function Alert({
   variant,
   className,
   animation,
+  transition,
   ...props
 }: AlertProps) {
   const { reference: ref } = props;
@@ -85,6 +90,7 @@ export default function Alert({
           initial={"initial"}
           animate={"animate"}
           exit={"exit"}
+          transition={transition}
           className={cn(AlertVariants({ variant, className }))}
           {...props}
         >
