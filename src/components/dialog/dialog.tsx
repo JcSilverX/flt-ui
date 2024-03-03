@@ -18,23 +18,25 @@ import defaultVariants from "./def-dialog-animations";
 import DialogProps from "./dialog-props";
 
 export default function Example1() {
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [[target, isOpen], setIsOpen] = React.useState<[string, boolean]>(['', false]);
 
-  const handleOpen = (): void => setIsOpen(true);
-  const handleClose = (): void => setIsOpen(false);
+  const handleOpen = (id: string): void => { setIsOpen([id, true]) };
+  const handleClose = (): void => setIsOpen(['', false]);
 
   return (
     <>
-      <Button size="lg" onClick={handleOpen}>
+      <Button size="lg" onClick={() => handleOpen('modal1')}>
         Open Modal 1
       </Button>
 
       <Dialog
+        dialogKey='modal1'
+        id={target}
         isOpen={isOpen}
         onHide={handleClose}
         blur
         backdrop="static"
-        animation="zoom"
+        animation="fade"
       >
         <DialogContent>
           <DialogHeader>
@@ -45,7 +47,44 @@ export default function Example1() {
             </Button>
           </DialogHeader>
 
-          <DialogBody>body</DialogBody>
+          <DialogBody>
+            <Button size="lg" onClick={() => handleOpen('modal2')}>
+              Open Modal 2
+            </Button>
+          </DialogBody>
+
+          <DialogFooter>
+            <Button variant={"destructive"} onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant={"primary"}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        dialogKey='modal2'
+        id={target}
+        isOpen={isOpen}
+        onHide={handleClose}
+        blur
+        backdrop="static"
+        animation="fade"
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Dialog Title 1</DialogTitle>
+
+            <Button variant={"ghost"} onClick={handleClose}>
+              &times;
+            </Button>
+          </DialogHeader>
+
+          <DialogBody>
+            <Button size="lg" onClick={() => handleOpen('modal1')}>
+              Go back to Modal 1
+            </Button>
+          </DialogBody>
 
           <DialogFooter>
             <Button variant={"destructive"} onClick={handleClose}>
@@ -61,6 +100,8 @@ export default function Example1() {
 
 function Dialog({
   children,
+  dialogKey,
+  id,
   isOpen,
   onHide,
   backdrop,
@@ -82,7 +123,7 @@ function Dialog({
   const [animateStaticDialog, setAnimateStaticDialog] =
     React.useState<boolean>(false);
 
-  useFocusTrap(dialogRef, isOpen, initialFocus);
+  useFocusTrap(dialogRef, isOpen && id === dialogKey, initialFocus);
 
   const variants =
     animation === false
@@ -142,7 +183,7 @@ function Dialog({
         }}
       >
         <AnimatePresence>
-          {isOpen && (
+          {isOpen && dialogKey === id && (
             <DialogOverlay>
               <div
                 ref={dialogRef}
