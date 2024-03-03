@@ -2,7 +2,7 @@
 
 import React from "react";
 import Button from "../button/button";
-import useFocusTrap from "@/lib/hooks/use-focustrap";
+import useFocusTrap from "@/lib/hooks/use-focus-trap";
 import { createPortal } from "react-dom";
 import useIsMounted from "@/lib/hooks/use-is-mounted";
 import DialogContext from "@/context/dialog-context-provider";
@@ -18,25 +18,29 @@ import defaultVariants from "./def-dialog-animations";
 import DialogProps from "./dialog-props";
 
 export default function Example1() {
-  const [[target, isOpen], setIsOpen] = React.useState<[string, boolean]>(['', false]);
+  const [[target, isOpen], setIsOpen] = React.useState<[string, boolean]>([
+    "",
+    false,
+  ]);
 
-  const handleOpen = (id: string): void => { setIsOpen([id, true]) };
-  const handleClose = (): void => setIsOpen(['', false]);
+  const handleOpen = (id: string): void => {
+    setIsOpen([id, true]);
+  };
+  const handleClose = (): void => setIsOpen(["", false]);
 
   return (
     <>
-      <Button size="lg" onClick={() => handleOpen('modal1')}>
+      <Button size="lg" onClick={() => handleOpen("modal1")}>
         Open Modal 1
       </Button>
 
       <Dialog
-        dialogKey='modal1'
+        dialogKey="modal1"
         id={target}
         isOpen={isOpen}
         onHide={handleClose}
         blur
         backdrop="static"
-        animation="fade"
       >
         <DialogContent>
           <DialogHeader>
@@ -48,7 +52,7 @@ export default function Example1() {
           </DialogHeader>
 
           <DialogBody>
-            <Button size="lg" onClick={() => handleOpen('modal2')}>
+            <Button size="lg" onClick={() => handleOpen("modal2")}>
               Open Modal 2
             </Button>
           </DialogBody>
@@ -63,7 +67,7 @@ export default function Example1() {
       </Dialog>
 
       <Dialog
-        dialogKey='modal2'
+        dialogKey="modal2"
         id={target}
         isOpen={isOpen}
         onHide={handleClose}
@@ -81,7 +85,7 @@ export default function Example1() {
           </DialogHeader>
 
           <DialogBody>
-            <Button size="lg" onClick={() => handleOpen('modal1')}>
+            <Button size="lg" onClick={() => handleOpen("modal1")}>
               Go back to Modal 1
             </Button>
           </DialogBody>
@@ -140,7 +144,7 @@ function Dialog({
   const onEscapeDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     if (event.key !== "Escape") return;
 
-    if (backdrop === "static") {
+    if (backdrop === "static" && !keyboard) {
       handleStaticAnimation();
       return;
     }
