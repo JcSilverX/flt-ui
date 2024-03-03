@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority";
 import cn from "@/lib/utils/cn";
 
 const DialogContentVariants = cva(
-  "relative flex flex-col w-full text-inherit pointer-events-auto bg-white border border-gray-950/90 rounded-lg shadow outline-[0]",
+  "relative flex flex-col w-full text-inherit pointer-events-auto bg-white border border-gray-950/50 rounded-lg shadow outline-[0]",
   {
     variants: {
       scrollable: {
