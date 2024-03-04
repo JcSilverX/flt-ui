@@ -62,8 +62,7 @@ const AlertVariants = cva(
 
 type Animation = Omit<AnimationProps, "variants" | "transition">;
 
-type AlertProps = VariantProps<typeof AlertVariants> & {
-  children: React.ReactNode;
+export type AlertProps = React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof AlertVariants> & {
   reference?: React.RefObject<HTMLDivElement>;
   show?: boolean;
   animation?: false | Animation;
@@ -71,15 +70,7 @@ type AlertProps = VariantProps<typeof AlertVariants> & {
   className?: string;
 };
 
-export default function Alert({
-  children,
-  show,
-  variant,
-  className,
-  animation,
-  transition,
-  ...props
-}: AlertProps) {
+export default function Alert({ children, show, animation, transition, className, variant, ...props }: AlertProps) {
   const { reference: ref } = props;
 
   return (
@@ -95,7 +86,6 @@ export default function Alert({
           exit={"exit"}
           transition={transition}
           className={cn(AlertVariants({ variant, className }))}
-          {...props}
         >
           {children}
         </motion.div>
@@ -103,8 +93,3 @@ export default function Alert({
     </AnimatePresence>
   );
 }
-
-
-
-
-
