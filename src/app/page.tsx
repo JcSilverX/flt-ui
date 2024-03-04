@@ -2,6 +2,7 @@ import AlertDialogExample from "@/components/alert-dialog/alert-dialog";
 import { AlertExample1 } from "@/components/alert/alert";
 import { Example4 } from "@/components/avatar/avatar";
 import Button from "@/components/button/button";
+import { CarouselExample1 } from "@/components/carousel/carousel";
 import { Example1 } from "@/components/dialog/dialog";
 
 export default function Home() {
@@ -27,6 +28,9 @@ export default function Home() {
 
       {/* Avatar */}
       <Example4 />
+
+      {/* Carousel */}
+      <CarouselExample1 />
     </main>
   );
 }
