@@ -1,5 +1,6 @@
 import AlertDialogExample from "@/components/alert-dialog/alert-dialog";
 import { AlertExample1 } from "@/components/alert/alert";
+import { Example4 } from "@/components/avatar/avatar";
 import Button from "@/components/button/button";
 import { Example1 } from "@/components/dialog/dialog";
 
@@ -23,6 +24,9 @@ export default function Home() {
 
       {/* Alert Dialog */}
       <AlertDialogExample />
+
+      {/* Avatar */}
+      <Example4 />
     </main>
   );
 }
