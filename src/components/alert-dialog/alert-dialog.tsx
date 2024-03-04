@@ -33,7 +33,7 @@ export default function AlertDialogExample() {
   return (
     <>
       <Button size="lg" onClick={() => handleOpen("modal3")}>
-        Open Modal 1
+        Open Alert Dialog
       </Button>
 
       <AlertDialog
