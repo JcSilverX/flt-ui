@@ -11,6 +11,9 @@ import {
   Variants,
   motion,
 } from "framer-motion";
+import AlertDescription from "./alert-description";
+import AlertLink from "./alert-link";
+import AlertTitle from "./alert-title";
 
 const AlertAnimation = {
   initial: {
@@ -86,7 +89,7 @@ export default function Alert({
           key={"alert"}
           ref={ref}
           role="alert"
-          variants={animation as Variants}
+          variants={animation === false ? {} : animation as Variants}
           initial={"initial"}
           animate={"animate"}
           exit={"exit"}
@@ -101,52 +104,7 @@ export default function Alert({
   );
 }
 
-type AlertTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
-  reference?: React.RefObject<HTMLHeadingElement>;
-};
 
-function AlertTitle({ children, className, ...props }: AlertTitleProps) {
-  const { reference: ref } = props;
 
-  return (
-    <h5
-      ref={ref}
-      {...props}
-      className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    >
-      {children}
-    </h5>
-  );
-}
 
-type AlertDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & {
-  reference?: React.RefObject<HTMLParagraphElement>;
-};
 
-function AlertDescription({
-  children,
-  className,
-  ...props
-}: AlertDescriptionProps) {
-  const { reference: ref } = props;
-
-  return (
-    <p ref={ref} className="text-sm leading-relaxed" {...props}>
-      {children}
-    </p>
-  );
-}
-
-type AlertLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-  reference?: React.RefObject<HTMLAnchorElement>;
-};
-
-function AlertLink({ children, href, className, ...props }: AlertLinkProps) {
-  const { reference: ref } = props;
-
-  return (
-    <a ref={ref} href={href}>
-      {children}
-    </a>
-  );
-}

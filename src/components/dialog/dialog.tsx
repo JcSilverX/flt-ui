@@ -17,7 +17,7 @@ import DialogTitle from "./dialog-title";
 import defaultVariants from "./def-dialog-animations";
 import DialogProps from "./dialog-props";
 
-export default function Example1() {
+export function Example1() {
   const [[target, isOpen], setIsOpen] = React.useState<[string, boolean]>([
     "",
     false,
@@ -102,7 +102,7 @@ export default function Example1() {
   );
 }
 
-function Dialog({
+export default function Dialog({
   children,
   dialogKey,
   id,

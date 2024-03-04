@@ -1,6 +1,7 @@
+import AlertDialogExample from "@/components/alert-dialog/alert-dialog";
 import { AlertExample1 } from "@/components/alert/alert";
 import Button from "@/components/button/button";
-import Dialog from "@/components/dialog/dialog";
+import { Example1 } from "@/components/dialog/dialog";
 
 export default function Home() {
   return (
@@ -15,10 +16,13 @@ export default function Home() {
       <Button variant={"link"}>Link</Button>
 
       {/* dialog */}
-      <Dialog />
+      <Example1 />
 
       {/* Alert */}
       <AlertExample1 />
+
+      {/* Alert Dialog */}
+      <AlertDialogExample />
     </main>
   );
 }
