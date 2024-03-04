@@ -127,7 +127,7 @@ export default function Dialog({
   const [animateStaticDialog, setAnimateStaticDialog] =
     React.useState<boolean>(false);
 
-  useFocusTrap(dialogRef, isOpen && id === dialogKey, initialFocus);
+  useFocusTrap(dialogRef, isOpen as boolean && id === dialogKey, initialFocus);
 
   const variants =
     animation === false

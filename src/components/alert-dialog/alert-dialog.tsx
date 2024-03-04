@@ -1,23 +1,62 @@
 'use client';
 
 import React from "react";
-import Button from "../button/button";
+import Button, { ButtonProps } from "../button/button";
 import Dialog from "../dialog/dialog";
-import DialogHeader from "../dialog/dialog-header";
-import DialogTitle from "../dialog/dialog-title";
-import DialogContent from "../dialog/dialog-content";
-import DialogBody from "../dialog/dialog-body";
-import DialogFooter from "../dialog/dialog-footer";
+import DialogHeader, { DialogHeaderProps } from "../dialog/dialog-header";
+import DialogTitle, { DialogTitleProps } from "../dialog/dialog-title";
+import DialogContent, { DialogContentProps } from "../dialog/dialog-content";
+import DialogBody, { DialogBodyProps } from "../dialog/dialog-body";
+import DialogFooter, { DialogFooterProps } from "../dialog/dialog-footer";
+import cn from "@/lib/utils/cn";
+import DialogProps from "../dialog/dialog-props";
 
-export const AlertDialog = Dialog;
-export const AlertDialogContent = DialogContent;
-export const AlertDialogHeader = DialogHeader;
-export const AlertDialogTitle = DialogTitle;
-export const AlertDialogDescription = DialogBody;
-export const AlertDialogFooter = DialogFooter;
+type AlertDialogProps = DialogProps;
 
-export const AlertDialogCancel = Button;
-export const AlertDialogAction = Button;
+export function AlertDialog({ isOpen, onHide, ...props }: AlertDialogProps) {
+  return <Dialog isOpen={isOpen} onHide={onHide} centered backdrop='static' animation='zoom' {...props} />
+}
+
+type AlertDialogContentProps = DialogContentProps;
+
+export function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
+  return <DialogContent className={cn(className)} {...props} />
+}
+
+type AlertDialogHeaderProps = DialogHeaderProps;
+
+export function AlertDialogHeader({ className, ...props }: AlertDialogHeaderProps) {
+  return <DialogHeader className={cn(className)} {...props} />;
+}
+
+
+type AlertDialogTitleProps = DialogTitleProps;
+
+export function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
+  return <DialogTitle className={cn(className)} {...props} />
+}
+
+type AlertDialogDescriptionProps = DialogBodyProps;
+
+export function AlertDialogDescription({ className, ...props }: AlertDialogDescriptionProps) {
+  return <DialogBody className={cn(className)} {...props} />
+}
+
+type AlertDialogFooterProps = DialogFooterProps;
+
+export function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
+  return <DialogFooter className={cn("space-x-2", className)} {...props} />;
+}
+
+type AlertButtonProps = ButtonProps;
+
+export function AlertDialogCancel({ variant = 'outline', className, ...props }: AlertButtonProps) {
+  return <Button variant={variant} className={cn(className)} {...props} />;
+}
+
+export function AlertDialogAction({ variant, className, ...props }: AlertButtonProps) {
+  return <Button variant={variant} className={cn(className)} {...props} />;
+}
 
 export default function AlertDialogExample() {
   const [[target, isOpen], setIsOpen] = React.useState<[string, boolean]>([
@@ -41,10 +80,6 @@ export default function AlertDialogExample() {
         id={target}
         isOpen={isOpen}
         onHide={handleClose}
-        blur
-        backdrop="static"
-        animation='zoom'
-        centered
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -60,14 +95,13 @@ export default function AlertDialogExample() {
           </AlertDialogDescription>
 
           <AlertDialogFooter>
-            <AlertDialogCancel variant={"destructive"} onClick={handleClose}>
+            <AlertDialogCancel onClick={handleClose}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction variant={"primary"}>Save</AlertDialogAction>
+            <AlertDialogAction>Save</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
     </>
   );
 }

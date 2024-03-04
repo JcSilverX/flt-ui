@@ -30,7 +30,7 @@ const ButtonVariants = cva(
   }
 );
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof ButtonVariants> & {
     reference?: React.RefObject<HTMLButtonElement>;
   };

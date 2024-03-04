@@ -2,6 +2,7 @@ import { Variants, motion } from "framer-motion";
 import useDialogContext from "@/lib/hooks/use-dialog-context";
 import { cva } from "class-variance-authority";
 import cn from "@/lib/utils/cn";
+import { HTMLAttributes } from "react";
 
 const DialogContentVariants = cva(
   "relative flex flex-col w-full text-inherit pointer-events-auto bg-white border border-gray-950/50 rounded-lg shadow outline-[0]",
@@ -22,10 +23,7 @@ const DialogContentVariants = cva(
   }
 );
 
-type DialogContentProps = {
-  children: React.ReactNode;
-  className?: string;
-};
+export type DialogContentProps = React.HTMLAttributes<HTMLDivElement> & {};
 
 export default function DialogContent({
   children,

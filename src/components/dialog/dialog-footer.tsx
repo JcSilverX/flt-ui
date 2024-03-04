@@ -1,11 +1,10 @@
-type DialogFooterProps = {
-  children: React.ReactNode;
-  className?: string;
-};
+import cn from "@/lib/utils/cn";
 
-export default function DialogFooter({ children }: DialogFooterProps) {
+export type DialogFooterProps = React.HTMLAttributes<HTMLDivElement> & {};
+
+export default function DialogFooter({ children, className }: DialogFooterProps) {
   return (
-    <div className="flex flex-shrink-0 flex-wrap items-center justify-end p-[calc(1rem_-_.5rem_*_.5)] bg-inherit rounded-b-full border-t">
+    <div className={cn("flex flex-shrink-0 flex-wrap items-center justify-end p-[calc(1rem_-_.5rem_*_.5)] bg-inherit rounded-b-full border-t", className)}>
       {children}
     </div>
   );
