@@ -14,7 +14,7 @@ type AvatarProps = React.HTMLAttributes<HTMLDivElement> & {};
 
 export default function Avatar({ children, className, ...props }: AvatarProps) {
   return (
-    <div className={cn('relative flex h-8 w-8 flex-shrink-0 overflow-hidden rounded-full', className)} {...props}>{children}</div>
+    <div className={cn('relative flex max-w-8 max-h-8 flex-shrink-0 overflow-hidden rounded-full', className)} {...props}>{children}</div>
   );
 }
 
