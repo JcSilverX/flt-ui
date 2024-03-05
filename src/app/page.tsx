@@ -2,12 +2,12 @@ import AlertDialogExample from "@/components/alert-dialog/alert-dialog";
 import { AlertExample1 } from "@/components/alert/alert";
 import { Example4 } from "@/components/avatar/avatar";
 import Button from "@/components/button/button";
-import { CarouselExample1 } from "@/components/carousel/carousel";
+import { CarouselExample1 } from "@/components/carousel/stories/carousel-example1";
 import { Example1 } from "@/components/dialog/dialog";
 
 export default function Home() {
   return (
-    <main className="grid pt-4 gap-4 max-w-[20rem] mx-auto">
+    <main className="grid py-16 gap-4 max-w-[70%] mx-auto">
       {/* buttons */}
       <Button size={"sm"}>Default</Button>
       <Button variant={"destructive"}>Destructive</Button>

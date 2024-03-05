@@ -1,35 +1,15 @@
 "use client";
 
 import CarouselContext from "@/context/carousel-context-provider";
-import useCarouselContext from "@/lib/hooks/use-carousel-context";
 import cn from "@/lib/utils/cn";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, PanInfo, motion, useMotionValue } from "framer-motion";
 import React from "react";
-import Button, { ButtonProps } from "../button/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import { CarouselControl } from "./carousel-control";
+import { CarouselIndicators } from "./carousel-indicators";
 
-export function CarouselExample1() {
-  return (
-    <Carousel>
-      <CarouselContent>
-        <CarouselItem className="w-full h-full bg-gray-400">one</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">two</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">three</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">four</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">five</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">six</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">seven</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">eight</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">nine</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">ten</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">eleven</CarouselItem>
-        <CarouselItem className="w-full h-full bg-gray-400">twelve</CarouselItem>
-      </CarouselContent>
-    </Carousel>
-  );
-}
 
-const TRESHOLD: number = 50 as const;
+const TRESHOLD: number = 10000 as const;
 
 type CarouselProps = React.HTMLAttributes<HTMLDivElement> & {
 };
@@ -38,63 +18,90 @@ export default function Carousel({
   children,
   className }: CarouselProps) {
   const [page, setPage] = React.useState<number>(0);
+  const [direction, setDirection] = React.useState<number>(0);
   const carouselContentRef = React.useRef<HTMLDivElement>(null);
+  const childCount = useChildCount(carouselContentRef);
+
+  const dragX = useMotionValue(0);
+
+  const paginate = (newDirection: number): void => {
+  };
 
   // event handlers / actions
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo): void => {
+    const x = Math.abs(dragX.get());
+
+    if (x > TRESHOLD) {
+      if (dragX.get() < 0) {
+        paginate(1); // Next page
+      } else {
+        paginate(-1); // Previous page
+      }
+    }
+  };
+
 
   return (
     <CarouselContext.Provider
       value={{
         page,
+        direction,
+        childCount,
         carouselContentRef,
+        dragX,
+        handleDragEnd,
       }}
     >
       <AnimatePresence>
         <motion.div key={"carousel"} className={cn("relative overflow-clip", className)}>
           {
-            true && <>
-              <CarouselControl onClick={() => setPage((prev) => prev - 1)} className="left-0"><ChevronLeftIcon width={32} height={32} /></CarouselControl>
-              <CarouselControl onClick={() => setPage((prev) => prev + 1)} className="right-0"><ChevronRightIcon width={32} height={32} /></CarouselControl>
-            </>
+            true &&
+            <CarouselIndicators>
+              {
+                Array.from({ length: childCount }).map((_, index) => (
+                  <span key={index} onClick={() => setPage(index)}>
+                    {index + 1}
+                  </span>
+                ))
+              }
+            </CarouselIndicators>
           }
           {children}
+          {
+            true && <>
+              <CarouselControl onClick={() => setPage((prev) => (prev - 1 + childCount) % childCount)} className="left-0" aria-controls="" aria-label=""><ChevronLeftIcon width={32} height={32} /></CarouselControl>
+              <CarouselControl onClick={() => setPage((prev) => (prev + 1) % childCount)} className="right-0" aria-controls="" aria-label=""><ChevronRightIcon width={32} height={32} /></CarouselControl>
+            </>
+          }
         </motion.div>
       </AnimatePresence>
     </CarouselContext.Provider >
   );
 }
 
-type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {};
+// utils / hooks
+function useChildCount(ref: React.RefObject<HTMLElement>) {
+  const [numberOfCols, setNumberOfCols] = React.useState<number>(0);
 
-function CarouselContent({
-  children,
-  className }: CarouselContentProps) {
-  const { page, carouselContentRef: ref } = useCarouselContext();
+  React.useEffect(() => {
+    const parentElement = ref.current!;
 
-  return (
-    <motion.div
-      key={page}
-      ref={ref}
-      className={cn('grid grid-flow-col-dense grid-cols-[repeat(12,100%)] grid-rows-[300px]', className)}
-    >
-      {children}
-    </motion.div>
-  );
-}
+    // guard against `ref.current` being null.
+    if (!parentElement) return;
 
-type CarouselItemProps = React.HTMLAttributes<HTMLDivElement> & {};
+    // function to update the child count.
+    // const updateChildCount = (): void => setNumberOfCols(parentElement.childElementCount);
+    if (parentElement.childElementCount === 0) return;
 
-function CarouselItem({ children, className }: CarouselItemProps) {
-  return (
-    <motion.div key={"carousel-item"} className={cn("", className)}>
-      {children}
-    </motion.div>
-  );
-}
+    setNumberOfCols(parentElement.childElementCount)
 
+    // // observer function to track mutations
+    // const observer = new MutationObserver(updateChildCount);
+    // observer.observe(parentElement, { childList: true, subtree: true });
 
-type CarouselControlProps = ButtonProps;
+    // // cleanup function
+    // return (() => observer.disconnect());
+  }, [ref]);
 
-function CarouselControl({ variant = 'ghost', className, ...props }: CarouselControlProps) {
-  return <Button variant={variant} className={cn("absolute inset-y-0 my-auto z-10 text-gray-950/50 hover:bg-transparent", className)} {...props} />;
+  return numberOfCols;
 }
