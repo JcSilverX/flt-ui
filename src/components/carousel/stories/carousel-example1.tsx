@@ -9,7 +9,8 @@ import React from "react";
 export function CarouselExample1() {
   // state
   const [page, setPage] = React.useState(0);
-  const [direction, setDirection] = React.useState<"left" | "right">("left");
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const carouselContentRef = React.useRef<HTMLDivElement>(null);
 
   // event handlers / actions
   const paginate = React.useCallback(
@@ -17,18 +18,55 @@ export function CarouselExample1() {
     [page]
   );
 
-  const handleNext = React.useCallback((): void => paginate(1), [paginate]);
-  const handlePrev = React.useCallback((): void => paginate(-1), [paginate]);
+  const handleNext = React.useCallback((): void => {
+    setIsTransitioning(true);
+
+    paginate(1);
+  }, [paginate]);
+
+  const handlePrev = React.useCallback((): void => {
+    setIsTransitioning(true);
+
+    paginate(-1);
+  }, [paginate]);
+
+  const handleTransitionEnd = React.useCallback((): void => {
+    setIsTransitioning(false);
+
+    const carouselContent = carouselContentRef.current;
+
+    if (!carouselContent) return;
+
+    if (page === 0) {
+      const lastPage =
+        carouselContent.children[carouselContent.children.length - 1];
+      carouselContent.insertBefore(
+        lastPage.cloneNode(true),
+        carouselContent.firstChild
+      );
+      carouselContent.removeChild(lastPage);
+      setPage(1);
+    } else if (page === carouselContent.children.length - 1) {
+      const firstPage = carouselContent.children[0];
+      carouselContent.appendChild(firstPage.cloneNode(true));
+      carouselContent.removeChild(firstPage);
+      setPage(page - 1);
+    }
+  }, [page]);
 
   return (
     <Carousel className="h-[200px]">
       <CarouselContent
-        className="transition-transform duration-700 ease-in-out"
+        reference={carouselContentRef}
+        className={cn("transition-transform duration-0 ease-in-out", {
+          "duration-700": isTransitioning,
+        })}
         style={{
           transform: `translateX(-${page * 100}%)`,
         }}
+        onTransitionEnd={handleTransitionEnd}
       >
-        <CarouselItem className="bg-gray-500/30">
+        <CarouselItem data-jsx-slide="1" className="bg-gray-500/30">
           <p>1</p>
           <p>2</p>
           <p>3</p>
@@ -36,7 +74,7 @@ export function CarouselExample1() {
           <p>5</p>
           <p>6</p>
         </CarouselItem>
-        <CarouselItem className="bg-gray-500/40">
+        <CarouselItem data-jsx-slide="2" className="bg-gray-500/40">
           <p>7</p>
           <p>8</p>
           <p>9</p>
@@ -44,7 +82,7 @@ export function CarouselExample1() {
           <p>11</p>
           <p>12</p>
         </CarouselItem>
-        <CarouselItem className="bg-gray-500/50">
+        <CarouselItem data-jsx-slide="3" className="bg-gray-500/50">
           <p>13</p>
           <p>14</p>
           <p>15</p>
@@ -89,7 +127,7 @@ function Carousel({
   return (
     <div
       ref={ref}
-      className={cn("relative overflow-cli", className)}
+      className={cn("relative overflow-clip", className)}
       {...props}
     >
       {children}
@@ -104,10 +142,11 @@ type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {
 function CarouselContent({
   children,
   className,
+  reference: ref,
   ...props
 }: CarouselContentProps) {
   return (
-    <div className={cn("flex", className)} {...props}>
+    <div ref={ref} className={cn("flex", className)} {...props}>
       {children}
     </div>
   );
@@ -117,12 +156,21 @@ type CarouselItemProps = React.HTMLAttributes<HTMLDivElement> & {
   reference?: React.RefObject<HTMLDivElement>;
 };
 
-function CarouselItem({ children, className, ...props }: CarouselItemProps) {
+function CarouselItem({
+  children,
+  className,
+  reference: ref,
+  ...props
+}: CarouselItemProps) {
   return (
     <div
+      ref={ref}
       role="group"
       aria-roledescription="slide"
-      className={cn("min-w-0 flex-shrink-0 flex-grow-0 basis-full", className)}
+      className={cn(
+        "min-w-0 flex-shrink-0 flex-grow-0 basis-full backface-hidden",
+        className
+      )}
       {...props}
     >
       {children}

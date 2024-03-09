@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+type AddUtilities = (utilities: { [key: string]: any }) => void;
+
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -13,8 +15,25 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      backfaceVisibility: {
+        hidden: "hidden",
+        visible: "visible",
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }: { addUtilities: AddUtilities }) {
+      const newUtilities = {
+        ".backface-hidden": {
+          "backface-visibility": "hidden",
+        },
+        ".backface-visible": {
+          "backface-visibility": "visible",
+        },
+      };
+
+      addUtilities(newUtilities);
+    },
+  ],
 };
 export default config;
