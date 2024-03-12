@@ -67,28 +67,31 @@ export function CarouselExample1() {
         onTransitionEnd={handleTransitionEnd}
       >
         <CarouselItem data-jsx-slide="1" className="bg-gray-500/30">
-          <p>1</p>
-          <p>2</p>
-          <p>3</p>
-          <p>4</p>
-          <p>5</p>
-          <p>6</p>
+          {
+            // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
+            <img
+              src="https://placehold.co/600x400/gray/FFFFFF/png"
+              alt="first slide"
+            />
+          }
         </CarouselItem>
         <CarouselItem data-jsx-slide="2" className="bg-gray-500/40">
-          <p>7</p>
-          <p>8</p>
-          <p>9</p>
-          <p>10</p>
-          <p>11</p>
-          <p>12</p>
+          {
+            // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
+            <img
+              src="https://placehold.co/600x400/red/FFFFFF/png"
+              alt="first slide"
+            />
+          }
         </CarouselItem>
         <CarouselItem data-jsx-slide="3" className="bg-gray-500/50">
-          <p>13</p>
-          <p>14</p>
-          <p>15</p>
-          <p>16</p>
-          <p>17</p>
-          <p>18</p>
+          {
+            // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
+            <img
+              src="https://placehold.co/600x400/blue/FFFFFF/png"
+              alt="first slide"
+            />
+          }
         </CarouselItem>
       </CarouselContent>
 
