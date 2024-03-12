@@ -55,7 +55,7 @@ export function CarouselExample1() {
   }, [page]);
 
   return (
-    <Carousel className="h-[200px]">
+    <Carousel>
       <CarouselContent
         reference={carouselContentRef}
         className={cn("transition-transform duration-0 ease-in-out", {
