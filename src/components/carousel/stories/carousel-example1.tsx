@@ -8,14 +8,16 @@ import React from "react";
 
 export function CarouselExample1() {
   // state
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(1);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const carouselContentRef = React.useRef<HTMLDivElement>(null);
+  const isClonedRef = React.useRef(false);
+  const childCount = useChildCount(carouselContentRef);
 
   // event handlers / actions
   const paginate = React.useCallback(
-    (newDirection: number) => setPage(wrap(0, 3, page + newDirection)),
-    [page]
+    (newDirection: number) => setPage(wrap(0, childCount, page + newDirection)),
+    [childCount, page]
   );
 
   const handleNext = React.useCallback((): void => {
@@ -31,35 +33,43 @@ export function CarouselExample1() {
   }, [paginate]);
 
   const handleTransitionEnd = React.useCallback((): void => {
-    setIsTransitioning(false);
-
     const carouselContent = carouselContentRef.current;
 
     if (!carouselContent) return;
 
     if (page === 0) {
-      const lastPage =
-        carouselContent.children[carouselContent.children.length - 1];
-      carouselContent.insertBefore(
-        lastPage.cloneNode(true),
-        carouselContent.firstChild
-      );
-      carouselContent.removeChild(lastPage);
+      setIsTransitioning(false);
+      setPage(carouselContent.children.length - 2);
+    }
+
+    if (page === carouselContent.children.length - 1) {
+      setIsTransitioning(false);
       setPage(1);
-    } else if (page === carouselContent.children.length - 1) {
-      const firstPage = carouselContent.children[0];
-      carouselContent.appendChild(firstPage.cloneNode(true));
-      carouselContent.removeChild(firstPage);
-      setPage(page - 1);
     }
   }, [page]);
+
+  React.useEffect(() => {
+    const carouselContent = carouselContentRef.current;
+
+    if (!carouselContent || isClonedRef.current) return;
+
+    carouselContent.prepend(
+      carouselContent.children[carouselContent.children.length - 1].cloneNode(
+        true
+      )
+    );
+
+    carouselContent.append(carouselContent.children[1].cloneNode(true));
+
+    isClonedRef.current = true;
+  }, []);
 
   return (
     <Carousel>
       <CarouselContent
         reference={carouselContentRef}
-        className={cn("transition-transform duration-0 ease-in-out", {
-          "duration-700": isTransitioning,
+        className={cn("transition-none duration-0", {
+          "transition-transform duration-700 ease-in-out": isTransitioning,
         })}
         style={{
           transform: `translateX(-${page * 100}%)`,
@@ -201,6 +211,22 @@ export function CarouselControl({
 }
 
 // utils / hooks
+function useChildCount(ref: React.RefObject<HTMLElement>) {
+  const [numberOfCols, setNumberOfCols] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const parentElement = ref.current!;
+
+    // guard against `ref.current` being null.
+    if (!parentElement) return;
+
+    if (parentElement.childElementCount === 0) return;
+
+    setNumberOfCols(parentElement.childElementCount);
+  }, [ref]);
+
+  return numberOfCols;
+}
 
 // "use client";
 
