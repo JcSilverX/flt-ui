@@ -84,6 +84,12 @@ export function CarouselExample1() {
               alt="first slide"
             />
           }
+
+          <CarouselCaption>
+            <h3>First slide label</h3>
+
+            <p>Some representative placeholder content for the first slide.</p>
+          </CarouselCaption>
         </CarouselItem>
         <CarouselItem data-jsx-slide="2" className="bg-gray-500/40">
           {
@@ -93,6 +99,12 @@ export function CarouselExample1() {
               alt="first slide"
             />
           }
+
+          <CarouselCaption>
+            <h3>Second slide label</h3>
+
+            <p>Some representative placeholder content for the second slide.</p>
+          </CarouselCaption>
         </CarouselItem>
         <CarouselItem data-jsx-slide="3" className="bg-gray-500/50">
           {
@@ -102,6 +114,12 @@ export function CarouselExample1() {
               alt="first slide"
             />
           }
+
+          <CarouselCaption>
+            <h3>Third slide label</h3>
+
+            <p>Some representative placeholder content for the third slide.</p>
+          </CarouselCaption>
         </CarouselItem>
       </CarouselContent>
 
@@ -181,7 +199,7 @@ function CarouselItem({
       role="group"
       aria-roledescription="slide"
       className={cn(
-        "min-w-0 flex-shrink-0 flex-grow-0 basis-full backface-hidden",
+        "relative min-w-0 flex-shrink-0 flex-grow-0 basis-full backface-hidden",
         className
       )}
       {...props}
@@ -210,6 +228,30 @@ export function CarouselControl({
   );
 }
 
+type CarouselCaptionProps = React.HTMLAttributes<HTMLDivElement> & {
+  reference?: React.RefObject<HTMLDivElement>;
+};
+
+function CarouselCaption({
+  children,
+  className,
+  reference: ref,
+  ...props
+}: CarouselCaptionProps) {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "absolute z-10 max-w-[70%] text-center bottom-0 inset-x-0 mx-auto mb-12",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
 // utils / hooks
 function useChildCount(ref: React.RefObject<HTMLElement>) {
   const [numberOfCols, setNumberOfCols] = React.useState<number>(0);
@@ -227,46 +269,3 @@ function useChildCount(ref: React.RefObject<HTMLElement>) {
 
   return numberOfCols;
 }
-
-// "use client";
-
-// import Carousel from "../carousel";
-// import { CarouselCaption } from "../carousel-caption";
-// import { CarouselContent } from "../carousel-content";
-// import { CarouselItem } from "../carousel-item";
-
-// export function CarouselExample1() {
-//   return (
-//     <Carousel className="grid grid-rows-[300px]">
-//       <CarouselContent>
-//         <CarouselItem className="bg-gray-400">
-//           image here #1
-
-//           {/* <CarouselCaption>
-//             <h3>First slide label</h3>
-
-//             <p>Some representative placeholder content for the first slide.</p>
-//           </CarouselCaption> */}
-//         </CarouselItem>
-//         <CarouselItem className="bg-gray-400">
-//           image here #2
-
-//           {/* <CarouselCaption>
-//             <h3>Second slide label</h3>
-
-//             <p>Some representative placeholder content for the second slide.</p>
-//           </CarouselCaption> */}
-//         </CarouselItem>
-//         <CarouselItem className="bg-gray-400">
-//           image here #3
-
-//           {/* <CarouselCaption>
-//             <h3>Third slide label</h3>
-
-//             <p>Some representative placeholder content for the third slide.</p>
-//           </CarouselCaption> */}
-//         </CarouselItem>
-//       </CarouselContent>
-//     </Carousel>
-//   );
-// }
