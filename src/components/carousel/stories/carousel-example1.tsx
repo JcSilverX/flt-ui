@@ -20,6 +20,12 @@ export function CarouselExample1() {
     [childCount, page]
   );
 
+  const handleClick = React.useCallback((newDirection: number): void => {
+    setIsTransitioning(true);
+
+    setPage(newDirection);
+  }, []);
+
   const handleNext = React.useCallback((): void => {
     setIsTransitioning(true);
 
@@ -66,6 +72,13 @@ export function CarouselExample1() {
 
   return (
     <Carousel>
+      {/* indicators */}
+      <CarouselIndicators>
+        <CarouselIndicator onClick={() => handleClick(1)} />
+        <CarouselIndicator onClick={() => handleClick(2)} />
+        <CarouselIndicator onClick={() => handleClick(3)} />
+      </CarouselIndicators>
+
       <CarouselContent
         reference={carouselContentRef}
         className={cn("transition-none duration-0", {
@@ -76,12 +89,13 @@ export function CarouselExample1() {
         }}
         onTransitionEnd={handleTransitionEnd}
       >
-        <CarouselItem data-jsx-slide="1" className="bg-gray-500/30">
+        <CarouselItem data-jsx-slide="1" className="bg-gray-500/30 select-none">
           {
             // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
             <img
               src="https://placehold.co/600x400/gray/FFFFFF/png"
               alt="first slide"
+              className="w-full"
             />
           }
 
@@ -97,6 +111,7 @@ export function CarouselExample1() {
             <img
               src="https://placehold.co/600x400/red/FFFFFF/png"
               alt="first slide"
+              className="w-full"
             />
           }
 
@@ -112,6 +127,7 @@ export function CarouselExample1() {
             <img
               src="https://placehold.co/600x400/blue/FFFFFF/png"
               alt="first slide"
+              className="w-full"
             />
           }
 
@@ -127,16 +143,16 @@ export function CarouselExample1() {
       <CarouselControl
         onClick={handlePrev}
         className="left-0"
-        aria-controls=""
-        aria-label=""
+        aria-label="carousel items"
+        aria-controls="previous page"
       >
         <ChevronLeftIcon width={32} height={32} />
       </CarouselControl>
       <CarouselControl
         onClick={handleNext}
         className="right-0"
-        aria-controls=""
-        aria-label=""
+        aria-label="carousel items"
+        aria-controls="next page"
       >
         <ChevronRightIcon width={32} height={32} />
       </CarouselControl>
@@ -158,6 +174,7 @@ function Carousel({
   return (
     <div
       ref={ref}
+      aria-live="off"
       className={cn("relative overflow-clip", className)}
       {...props}
     >
@@ -198,6 +215,7 @@ function CarouselItem({
       ref={ref}
       role="group"
       aria-roledescription="slide"
+      aria-label="1 of 3"
       className={cn(
         "relative min-w-0 flex-shrink-0 flex-grow-0 basis-full backface-hidden",
         className
@@ -242,13 +260,65 @@ function CarouselCaption({
     <div
       ref={ref}
       className={cn(
-        "absolute z-10 max-w-[70%] text-center bottom-0 inset-x-0 mx-auto mb-12",
+        "absolute z-10 max-w-[70%] text-center bottom-0 inset-x-0 mx-auto mb-14",
         className
       )}
       {...props}
     >
       {children}
     </div>
+  );
+}
+
+type CarouselIndicatorsProps = React.HTMLAttributes<HTMLDivElement> & {
+  reference?: React.RefObject<HTMLDivElement>;
+};
+
+function CarouselIndicators({
+  children,
+  className,
+  reference: ref,
+  ...props
+}: CarouselIndicatorsProps) {
+  return (
+    <div
+      ref={ref}
+      role="tablist"
+      aria-label="slides"
+      className={cn(
+        "absolute max-w-[70%] grid grid-flow-col-dense place-content-center space-x-2 bottom-0 inset-x-0 mx-auto mb-8 z-10 pointer-events-none",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+type CarouselIndicatorProps = ButtonProps;
+
+function CarouselIndicator({
+  children,
+  reference: ref,
+  className,
+  ...props
+}: CarouselIndicatorProps) {
+  return (
+    <Button
+      reference={ref}
+      role="tab"
+      aria-label="page 1"
+      aria-selected={false}
+      aria-controls="carousel-item-1"
+      tabIndex={-1}
+      size={"sm"}
+      className={cn(
+        "bg-gray-50 h-[.2175rem] w-[1.875rem] border-0 rounded-none pointer-events-auto",
+        className
+      )}
+      {...props}
+    />
   );
 }
 
