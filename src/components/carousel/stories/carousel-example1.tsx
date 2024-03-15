@@ -68,8 +68,6 @@ export function CarouselExample1() {
           </CarouselCaption>
         </CarouselItem>
       </CarouselContent>
-
     </Carousel>
   );
 }
-

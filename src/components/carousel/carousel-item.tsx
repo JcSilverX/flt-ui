@@ -11,7 +11,6 @@ export function CarouselItem({
   reference: ref,
   ...props
 }: CarouselItemProps) {
-
   return (
     <div
       ref={ref}

@@ -12,12 +12,23 @@ export function CarouselContent({
   reference: ref,
   ...props
 }: CarouselContentProps) {
-  const { page, isTransitioning, carouselContentRef, handleKeyDown, handleMouseEnter, handleMouseLeave, handleTransitionEnd } = useCarouselContext();
+  const {
+    page,
+    isTransitioning,
+    carouselContentRef,
+    handleKeyDown,
+    handleMouseEnter,
+    handleMouseLeave,
+    handleTransitionEnd,
+  } = useCarouselContext();
 
   return (
-    <div ref={carouselContentRef} className={cn("flex transition-none duration-0", className, {
-      "transition-transform duration-700 ease-in-out": isTransitioning,
-    })} {...props}
+    <div
+      ref={carouselContentRef}
+      className={cn("flex transition-none duration-0", className, {
+        "transition-transform duration-700 ease-in-out": isTransitioning,
+      })}
+      {...props}
       style={{
         transform: `translateX(-${page * 100}%)`,
       }}
@@ -31,4 +42,3 @@ export function CarouselContent({
     </div>
   );
 }
-

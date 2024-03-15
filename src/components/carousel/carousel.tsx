@@ -42,7 +42,8 @@ export default function Carousel({
 
   // event handlers / actions
   const paginate = React.useCallback(
-    (newDirection: number): void => setPage(wrap(0, childCount, page + newDirection)),
+    (newDirection: number): void =>
+      setPage(wrap(0, childCount, page + newDirection)),
     [childCount, page]
   );
 
@@ -51,7 +52,6 @@ export default function Carousel({
       setIsTransitioning(true);
       paginate(1);
     }, interval);
-
   }, [interval, paginate]);
 
   const stopAutoPlay = React.useCallback((): void => {
@@ -78,17 +78,20 @@ export default function Carousel({
     setPage(newDirection);
   }, []);
 
-  const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLDivElement>): void => {
-    if (!keyboard) return;
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>): void => {
+      if (!keyboard) return;
 
-    setIsTransitioning(true);
+      setIsTransitioning(true);
 
-    if (event.key === 'ArrowRight') {
-      paginate(1);
-    } else if (event.key === 'ArrowLeft') {
-      paginate(-1);
-    }
-  }, [keyboard, paginate]);
+      if (event.key === "ArrowRight") {
+        paginate(1);
+      } else if (event.key === "ArrowLeft") {
+        paginate(-1);
+      }
+    },
+    [keyboard, paginate]
+  );
 
   const handleMouseEnter = React.useCallback((): void => {
     const carouselContent = carouselContentRef.current;
@@ -151,7 +154,7 @@ export default function Carousel({
 
     startAutoPlay();
 
-    return (() => stopAutoPlay());
+    return () => stopAutoPlay();
   }, [startAutoPlay, loop, stopAutoPlay]);
 
   return (
@@ -164,7 +167,7 @@ export default function Carousel({
         handleKeyDown,
         handleMouseEnter,
         handleMouseLeave,
-        handleTransitionEnd
+        handleTransitionEnd,
       }}
     >
       <div
@@ -175,8 +178,7 @@ export default function Carousel({
       >
         {children}
 
-        {
-          controls &&
+        {controls && (
           <>
             {/* controls */}
             <CarouselControl
@@ -196,7 +198,7 @@ export default function Carousel({
               <ChevronRightIcon width={32} height={32} />
             </CarouselControl>
           </>
-        }
+        )}
       </div>
     </CarouselContext.Provider>
   );
