@@ -19,19 +19,29 @@ export function CarouselContent({
     handleKeyDown,
     handleMouseEnter,
     handleMouseLeave,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
     handleTransitionEnd,
   } = useCarouselContext();
 
   return (
     <div
       ref={carouselContentRef}
-      className={cn("flex transition-none duration-0", className, {
-        "transition-transform duration-700 ease-in-out": isTransitioning,
-      })}
+      className={cn(
+        "flex backface-hidden touch-pan-y transition-none duration-0",
+        className,
+        {
+          "transition-transform duration-700 ease-in-out": isTransitioning,
+        }
+      )}
       {...props}
       style={{
         transform: `translateX(-${page * 100}%)`,
       }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onKeyDown={handleKeyDown}

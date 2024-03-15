@@ -8,6 +8,8 @@ import { wrap } from "@/lib/utils/wrap";
 import { CarouselControl } from "./carousel-control";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 
+const TRESHOLD = 50 as const;
+
 type CarouselProps = React.HTMLAttributes<HTMLDivElement> & {
   activeIndex?: number;
   controls?: boolean;
@@ -33,6 +35,9 @@ export default function Carousel({
   // state
   const [page, setPage] = React.useState<number>(activeIndex);
   const [isTransitioning, setIsTransitioning] = React.useState<boolean>(false);
+  const [isDragging, setIsDragging] = React.useState<boolean>(false);
+  const [dragStartX, setDragStartX] = React.useState<number>(0);
+  const [dragDistance, setDragDistance] = React.useState<number>(0);
   const carouselContentRef = React.useRef<HTMLDivElement>(null);
   const isClonedRef = React.useRef<boolean>(false);
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -117,6 +122,47 @@ export default function Carousel({
     }
   }, [startAutoPlay, loop]);
 
+  const handlePointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>): void => {
+      setIsDragging(true);
+      setDragStartX(event.clientX);
+      setDragDistance(0);
+    },
+    []
+  );
+
+  const handlePointerMove = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>): void => {
+      if (!isDragging) return;
+
+      const newDistance = event.clientX - dragStartX;
+      setDragDistance(newDistance);
+    },
+    [dragStartX, isDragging]
+  );
+
+  const handlePointerUp = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>): void => {
+      const carouselContent = carouselContentRef.current;
+
+      if (!carouselContent) return;
+
+      if (!isDragging) return;
+
+      setIsDragging(false);
+      setIsTransitioning(true);
+
+      if (dragDistance > TRESHOLD) {
+        paginate(-1);
+      } else if (dragDistance < -TRESHOLD) {
+        paginate(1);
+      }
+
+      setDragDistance(0);
+    },
+    [dragDistance, isDragging, paginate]
+  );
+
   const handleTransitionEnd = React.useCallback((): void => {
     const carouselContent = carouselContentRef.current;
 
@@ -167,6 +213,9 @@ export default function Carousel({
         handleKeyDown,
         handleMouseEnter,
         handleMouseLeave,
+        handlePointerDown,
+        handlePointerMove,
+        handlePointerUp,
         handleTransitionEnd,
       }}
     >

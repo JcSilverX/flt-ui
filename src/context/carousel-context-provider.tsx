@@ -10,6 +10,9 @@ type TCarouselContext = {
   handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   handleMouseEnter: () => void;
   handleMouseLeave: () => void;
+  handlePointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
+  handlePointerMove: (event: React.PointerEvent<HTMLDivElement>) => void;
+  handlePointerUp: (event: React.PointerEvent<HTMLDivElement>) => void;
   handleTransitionEnd: () => void;
 };
 

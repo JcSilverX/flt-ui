@@ -17,7 +17,7 @@ export function CarouselItem({
       role="group"
       aria-roledescription="slide"
       className={cn(
-        "relative min-w-0 flex-shrink-0 flex-grow-0 basis-full backface-hidden",
+        "relative min-w-0 flex-shrink-0 flex-grow-0 basis-full",
         className
       )}
       {...props}
