@@ -1,30 +1,34 @@
 import useCarouselContext from "@/lib/hooks/use-carousel-context";
 import cn from "@/lib/utils/cn";
-import { motion } from "framer-motion";
+import React from "react";
 
-type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {};
+type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  reference?: React.RefObject<HTMLDivElement>;
+};
 
 export function CarouselContent({
   children,
-  className }: CarouselContentProps) {
-  const { page, carouselContentRef: ref } = useCarouselContext();
+  className,
+  reference: ref,
+  ...props
+}: CarouselContentProps) {
+  const { page, isTransitioning, carouselContentRef, handleKeyDown, handleMouseEnter, handleMouseLeave, handleTransitionEnd } = useCarouselContext();
 
   return (
-    <motion.div
-      key={page}
-      ref={ref}
-      initial={{
-        marginInline: `-${page * 100}%`
+    <div ref={carouselContentRef} className={cn("flex transition-none duration-0", className, {
+      "transition-transform duration-700 ease-in-out": isTransitioning,
+    })} {...props}
+      style={{
+        transform: `translateX(-${page * 100}%)`,
       }}
-      animate={{
-        marginInline: 0
-      }}
-      exit={{
-        marginInline: `${page * 100}%`
-      }}
-      className={cn('relative w-full h-full grid grid-flow-col-dense grid-cols-[repeat(3,minmax(100%,1fr))]', className)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
+      onTransitionEnd={handleTransitionEnd}
+      tabIndex={-1}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
+

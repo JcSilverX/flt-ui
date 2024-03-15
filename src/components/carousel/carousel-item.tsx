@@ -1,22 +1,29 @@
-import { motion } from "framer-motion";
-import cn from "@/lib/utils/cn";
 import useCarouselContext from "@/lib/hooks/use-carousel-context";
+import cn from "@/lib/utils/cn";
 
-type CarouselItemProps = React.HTMLAttributes<HTMLDivElement> & {};
+type CarouselItemProps = React.HTMLAttributes<HTMLDivElement> & {
+  reference?: React.RefObject<HTMLDivElement>;
+};
 
-export function CarouselItem({ children, className }: CarouselItemProps) {
-  const { page, dragX, handleDragEnd } = useCarouselContext();
+export function CarouselItem({
+  children,
+  className,
+  reference: ref,
+  ...props
+}: CarouselItemProps) {
 
   return (
-    <motion.div
-      key={page}
-      transition={{
-        x: { type: "spring", stiffness: 300, damping: 30, mass: 3 },
-        opacity: { duration: 0.2 },
-      }}
-      className={cn("relative w-full h-full", className)}>
+    <div
+      ref={ref}
+      role="group"
+      aria-roledescription="slide"
+      className={cn(
+        "relative min-w-0 flex-shrink-0 flex-grow-0 basis-full backface-hidden",
+        className
+      )}
+      {...props}
+    >
       {children}
-    </motion.div>
+    </div>
   );
 }
-

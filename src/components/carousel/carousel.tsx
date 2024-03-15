@@ -1,107 +1,203 @@
 "use client";
 
-import CarouselContext from "@/context/carousel-context-provider";
-import cn from "@/lib/utils/cn";
-import { AnimatePresence, PanInfo, motion, useMotionValue } from "framer-motion";
 import React from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import cn from "@/lib/utils/cn";
+import CarouselContext from "@/context/carousel-context-provider";
+import { useChildCount } from "@/lib/hooks/use-child-count";
+import { wrap } from "@/lib/utils/wrap";
 import { CarouselControl } from "./carousel-control";
-import { CarouselIndicators } from "./carousel-indicators";
-
-
-const TRESHOLD: number = 10000 as const;
+import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 
 type CarouselProps = React.HTMLAttributes<HTMLDivElement> & {
+  activeIndex?: number;
+  controls?: boolean;
+  keyboard?: boolean;
+  touch?: boolean;
+  interval?: number;
+  loop?: boolean;
+  reference?: React.RefObject<HTMLDivElement>;
 };
 
 export default function Carousel({
   children,
-  className }: CarouselProps) {
-  const [page, setPage] = React.useState<number>(0);
-  const [direction, setDirection] = React.useState<number>(0);
+  activeIndex = 1,
+  controls = true,
+  keyboard,
+  touch,
+  interval = 5000,
+  loop,
+  className,
+  reference: ref,
+  ...props
+}: CarouselProps) {
+  // state
+  const [page, setPage] = React.useState<number>(activeIndex);
+  const [isTransitioning, setIsTransitioning] = React.useState<boolean>(false);
   const carouselContentRef = React.useRef<HTMLDivElement>(null);
+  const isClonedRef = React.useRef<boolean>(false);
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const childCount = useChildCount(carouselContentRef);
 
-  const dragX = useMotionValue(0);
-
-  const paginate = (newDirection: number): void => {
-  };
+  // derived state
 
   // event handlers / actions
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo): void => {
-    const x = Math.abs(dragX.get());
+  const paginate = React.useCallback(
+    (newDirection: number): void => setPage(wrap(0, childCount, page + newDirection)),
+    [childCount, page]
+  );
 
-    if (x > TRESHOLD) {
-      if (dragX.get() < 0) {
-        paginate(1); // Next page
-      } else {
-        paginate(-1); // Previous page
-      }
+  const startAutoPlay = React.useCallback((): void => {
+    intervalRef.current = setInterval(() => {
+      setIsTransitioning(true);
+      paginate(1);
+    }, interval);
+
+  }, [interval, paginate]);
+
+  const stopAutoPlay = React.useCallback((): void => {
+    if (!intervalRef.current) return;
+
+    clearInterval(intervalRef.current);
+  }, []);
+
+  const handleNext = React.useCallback((): void => {
+    setIsTransitioning(true);
+
+    paginate(1);
+  }, [paginate]);
+
+  const handlePrev = React.useCallback((): void => {
+    setIsTransitioning(true);
+
+    paginate(-1);
+  }, [paginate]);
+
+  const handleClick = React.useCallback((newDirection: number): void => {
+    setIsTransitioning(true);
+
+    setPage(newDirection);
+  }, []);
+
+  const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (!keyboard) return;
+
+    setIsTransitioning(true);
+
+    if (event.key === 'ArrowRight') {
+      paginate(1);
+    } else if (event.key === 'ArrowLeft') {
+      paginate(-1);
     }
-  };
+  }, [keyboard, paginate]);
 
+  const handleMouseEnter = React.useCallback((): void => {
+    const carouselContent = carouselContentRef.current;
+
+    if (!carouselContent) return;
+
+    carouselContentRef.current.focus();
+
+    if (loop) {
+      stopAutoPlay();
+    }
+  }, [loop, stopAutoPlay]);
+
+  const handleMouseLeave = React.useCallback((): void => {
+    const carouselContent = carouselContentRef.current;
+
+    if (!carouselContent) return;
+
+    carouselContentRef.current.blur();
+
+    if (loop) {
+      startAutoPlay();
+    }
+  }, [startAutoPlay, loop]);
+
+  const handleTransitionEnd = React.useCallback((): void => {
+    const carouselContent = carouselContentRef.current;
+
+    if (!carouselContent) return;
+
+    if (page === 0) {
+      setIsTransitioning(false);
+      setPage(carouselContent.children.length - 2);
+    }
+
+    if (page === carouselContent.children.length - 1) {
+      setIsTransitioning(false);
+      setPage(1);
+    }
+  }, [page]);
+
+  React.useEffect(() => {
+    const carouselContent = carouselContentRef.current;
+
+    if (!carouselContent || isClonedRef.current) return;
+
+    carouselContent.prepend(
+      carouselContent.children[carouselContent.children.length - 1].cloneNode(
+        true
+      )
+    );
+
+    carouselContent.append(carouselContent.children[1].cloneNode(true));
+
+    isClonedRef.current = true;
+  }, []);
+
+  React.useEffect(() => {
+    if (!loop) return;
+
+    startAutoPlay();
+
+    return (() => stopAutoPlay());
+  }, [startAutoPlay, loop, stopAutoPlay]);
 
   return (
     <CarouselContext.Provider
       value={{
         page,
-        direction,
-        childCount,
+        isTransitioning,
         carouselContentRef,
-        dragX,
-        handleDragEnd,
+        handleClick,
+        handleKeyDown,
+        handleMouseEnter,
+        handleMouseLeave,
+        handleTransitionEnd
       }}
     >
-      <AnimatePresence>
-        <motion.div key={"carousel"} className={cn("relative overflow-clip", className)}>
-          {
-            true &&
-            <CarouselIndicators>
-              {
-                Array.from({ length: childCount }).map((_, index) => (
-                  <span key={index} onClick={() => setPage(index)}>
-                    {index + 1}
-                  </span>
-                ))
-              }
-            </CarouselIndicators>
-          }
-          {children}
-          {
-            true && <>
-              <CarouselControl onClick={() => setPage((prev) => (prev - 1 + childCount) % childCount)} className="left-0" aria-controls="" aria-label=""><ChevronLeftIcon width={32} height={32} /></CarouselControl>
-              <CarouselControl onClick={() => setPage((prev) => (prev + 1) % childCount)} className="right-0" aria-controls="" aria-label=""><ChevronRightIcon width={32} height={32} /></CarouselControl>
-            </>
-          }
-        </motion.div>
-      </AnimatePresence>
-    </CarouselContext.Provider >
+      <div
+        ref={ref}
+        aria-live="off"
+        className={cn("relative overflow-clip", className)}
+        {...props}
+      >
+        {children}
+
+        {
+          controls &&
+          <>
+            {/* controls */}
+            <CarouselControl
+              onClick={handlePrev}
+              className="left-0"
+              aria-label="carousel items"
+              aria-controls="previous page"
+            >
+              <ChevronLeftIcon width={32} height={32} />
+            </CarouselControl>
+            <CarouselControl
+              onClick={handleNext}
+              className="right-0"
+              aria-label="carousel items"
+              aria-controls="next page"
+            >
+              <ChevronRightIcon width={32} height={32} />
+            </CarouselControl>
+          </>
+        }
+      </div>
+    </CarouselContext.Provider>
   );
-}
-
-// utils / hooks
-function useChildCount(ref: React.RefObject<HTMLElement>) {
-  const [numberOfCols, setNumberOfCols] = React.useState<number>(0);
-
-  React.useEffect(() => {
-    const parentElement = ref.current!;
-
-    // guard against `ref.current` being null.
-    if (!parentElement) return;
-
-    // function to update the child count.
-    // const updateChildCount = (): void => setNumberOfCols(parentElement.childElementCount);
-    if (parentElement.childElementCount === 0) return;
-
-    setNumberOfCols(parentElement.childElementCount)
-
-    // // observer function to track mutations
-    // const observer = new MutationObserver(updateChildCount);
-    // observer.observe(parentElement, { childList: true, subtree: true });
-
-    // // cleanup function
-    // return (() => observer.disconnect());
-  }, [ref]);
-
-  return numberOfCols;
 }

@@ -1,15 +1,16 @@
 "use client";
 
-import { MotionValue, PanInfo } from "framer-motion";
 import { createContext } from "react";
 
 type TCarouselContext = {
   page: number;
-  direction: number;
-  childCount: number;
+  isTransitioning: boolean;
   carouselContentRef: React.RefObject<HTMLDivElement>;
-  dragX: MotionValue<number>;
-  handleDragEnd: (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void;
+  handleClick: (newDirection: number) => void;
+  handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
+  handleMouseEnter: () => void;
+  handleMouseLeave: () => void;
+  handleTransitionEnd: () => void;
 };
 
 const CarouselContext = createContext<TCarouselContext | null>(null);
