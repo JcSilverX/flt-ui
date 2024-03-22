@@ -7,7 +7,7 @@ import { Example1 } from "@/components/dialog/dialog";
 
 export default function Home() {
   return (
-    <main className="grid py-16 gap-4 max-w-[70%] mx-auto">
+    <main className="grid py-16 gap-4">
       {/* buttons */}
       <Button size={"sm"}>Default</Button>
       <Button variant={"destructive"}>Destructive</Button>
