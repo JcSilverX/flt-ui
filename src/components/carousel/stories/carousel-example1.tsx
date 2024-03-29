@@ -136,7 +136,7 @@ export function CarouselExample1() {
         }
         firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
       }
-    }, 500);
+    }, 400);
   }, [clientWidth, direction, dragDistance, page]);
 
   return (
