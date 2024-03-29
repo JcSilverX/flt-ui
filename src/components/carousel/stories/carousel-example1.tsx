@@ -106,6 +106,7 @@ export function CarouselExample1() {
     setClientWidth(carouselContent.clientWidth);
   }, []);
 
+  /// !!
   React.useEffect(() => {
     const carouselContent = carouselContentRef.current;
 
@@ -125,19 +126,19 @@ export function CarouselExample1() {
       firstPage.style.transform = `translate3d(${
         SLIDE_COUNT * clientWidth
       }px, 0px, 0px)`;
+    } else if (page === 1 && dragDistance === 0) {
+      setPage(1);
+      firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
     }
 
     setTimeout(() => {
-      if (page === SLIDE_COUNT) {
+      if (page === SLIDE_COUNT && dragDistance === 0) {
         setIsTransitioning(false);
-
-        if (dragDistance === 0) {
-          setPage(0);
-        }
+        setPage(0);
         firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
       }
     }, 400);
-  }, [clientWidth, direction, dragDistance, page]);
+  }, [clientWidth, direction, dragDistance, isDragging, page]);
 
   return (
     <div
