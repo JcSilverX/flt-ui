@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/button/button";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 import cn from "@/lib/utils/cn";
 import { wrap } from "@/lib/utils/wrap";
 import React from "react";
@@ -22,6 +23,7 @@ export function CarouselExample1() {
   const [direction, setDirection] = React.useState<"previous" | "next">("next");
 
   // derived state
+  const debouncedDragDistance = useDebounce(dragDistance, 100);
 
   // event handlers / actions
   const paginate = React.useCallback(
@@ -131,7 +133,6 @@ export function CarouselExample1() {
         firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
       }
     }, 500);
-
   }, [clientWidth, direction, dragDistance, page]);
 
   return (
