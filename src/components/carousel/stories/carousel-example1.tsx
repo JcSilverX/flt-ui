@@ -20,7 +20,6 @@ export function CarouselExample1() {
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const [dragStartX, setDragStartX] = React.useState<number>(0);
   const [dragDistance, setDragDistance] = React.useState<number>(0);
-  const [direction, setDirection] = React.useState<"previous" | "next">("next");
 
   // derived state
   const debouncedDragDistance = useDebounce(dragDistance, 100);
@@ -34,19 +33,16 @@ export function CarouselExample1() {
 
   const handleNext = React.useCallback((): void => {
     setIsTransitioning(true);
-    setDirection("next");
     paginate(1);
   }, [paginate]);
 
   const handlePrev = React.useCallback((): void => {
     setIsTransitioning(true);
-    setDirection("previous");
     paginate(-1);
   }, [paginate]);
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      console.log("key pressed");
       if (event.key === "ArrowRight") {
         handleNext();
       } else if (event.key === "ArrowLeft") {
@@ -138,7 +134,7 @@ export function CarouselExample1() {
         firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
       }
     }, 400);
-  }, [clientWidth, direction, dragDistance, isDragging, page]);
+  }, [clientWidth, dragDistance, isDragging, page]);
 
   return (
     <div
