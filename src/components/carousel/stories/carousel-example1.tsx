@@ -26,7 +26,7 @@ export function CarouselExample1() {
   // event handlers / actions
   const paginate = React.useCallback(
     (newDirection: number): void =>
-      setPage(wrap(0, SLIDE_COUNT, page + newDirection)),
+      setPage(wrap(0, SLIDE_COUNT + 1, page + newDirection)),
     [page]
   );
 
@@ -81,7 +81,6 @@ export function CarouselExample1() {
     (event: React.PointerEvent<HTMLDivElement>): void => {
       setIsDragging(false);
 
-      // setPage(wrap(0, SLIDE_COUNT, page - Math.sign(dragDistance)));
       if (dragDistance < -DRAG_TRESHOLD) {
         handleNext();
       } else if (dragDistance > DRAG_TRESHOLD) {
@@ -105,13 +104,43 @@ export function CarouselExample1() {
     setClientWidth(carouselContent.clientWidth);
   }, []);
 
+  React.useEffect(() => {
+    const carouselContent = carouselContentRef.current;
+
+    if (!carouselContent) return;
+
+    const firstPage = carouselContent.children[0] as HTMLDivElement;
+
+    if (page === SLIDE_COUNT - 1 && dragDistance < -DRAG_TRESHOLD) {
+      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth}px, 0px, 0px)`;
+    }
+
+    if (page === 0 && dragDistance > DRAG_TRESHOLD) {
+      setPage(SLIDE_COUNT);
+
+      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth}px, 0px, 0px)`;
+    }
+
+    setTimeout(() => {
+      if (page === SLIDE_COUNT) {
+        setIsTransitioning(false);
+
+        if (dragDistance === 0) {
+          setPage(0);
+        }
+        firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
+      }
+    }, 500);
+
+  }, [clientWidth, direction, dragDistance, page]);
+
   return (
     <div
       className="relative w-full max-w-xs mx-auto"
       role="region"
       aria-roledescription="carousel"
     >
-      <div className="overflow-cli">
+      <div className="overflow-clip">
         <div
           ref={carouselContentRef}
           className={cn(
@@ -122,9 +151,8 @@ export function CarouselExample1() {
             }
           )}
           style={{
-            transform: `translate3d(${
-              -page * clientWidth + dragDistance
-            }px, 0px, 0px)`,
+            transform: `translate3d(${-page * clientWidth + dragDistance
+              }px, 0px, 0px)`,
           }}
           tabIndex={-1}
           onPointerDown={handlePointerDown}
