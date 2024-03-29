@@ -114,13 +114,17 @@ export function CarouselExample1() {
     const firstPage = carouselContent.children[0] as HTMLDivElement;
 
     if (page === SLIDE_COUNT - 1 && dragDistance < -DRAG_TRESHOLD) {
-      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth}px, 0px, 0px)`;
+      firstPage.style.transform = `translate3d(${
+        SLIDE_COUNT * clientWidth
+      }px, 0px, 0px)`;
     }
 
     if (page === 0 && dragDistance > DRAG_TRESHOLD) {
       setPage(SLIDE_COUNT);
 
-      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth}px, 0px, 0px)`;
+      firstPage.style.transform = `translate3d(${
+        SLIDE_COUNT * clientWidth
+      }px, 0px, 0px)`;
     }
 
     setTimeout(() => {
@@ -152,8 +156,9 @@ export function CarouselExample1() {
             }
           )}
           style={{
-            transform: `translate3d(${-page * clientWidth + dragDistance
-              }px, 0px, 0px)`,
+            transform: `translate3d(${
+              -page * clientWidth + dragDistance
+            }px, 0px, 0px)`,
           }}
           tabIndex={-1}
           onPointerDown={handlePointerDown}
