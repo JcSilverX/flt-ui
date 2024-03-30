@@ -113,13 +113,14 @@ export function CarouselExample1() {
     if (page === SLIDE_COUNT - 1 && dragDistance < -DRAG_TRESHOLD) {
       firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth
         }px, 0px, 0px)`;
-    } else if (page === SLIDE_COUNT && dragDistance === 0) {
-      setTimeout(() => {
+    }
+    setTimeout(() => {
+      if (page === SLIDE_COUNT && dragDistance === 0) {
         setIsTransitioning(false);
         setPage(0);
         firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
-      }, 400);
-    }
+      }
+    }, 400);
 
     if (page === 0 && dragDistance > DRAG_TRESHOLD) {
       setPage(SLIDE_COUNT);
@@ -137,7 +138,7 @@ export function CarouselExample1() {
       role="region"
       aria-roledescription="carousel"
     >
-      <div className="overflow-cli">
+      <div className="overflow-clip">
         <div
           ref={carouselContentRef}
           className={cn(
