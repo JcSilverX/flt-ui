@@ -111,29 +111,24 @@ export function CarouselExample1() {
     const firstPage = carouselContent.children[0] as HTMLDivElement;
 
     if (page === SLIDE_COUNT - 1 && dragDistance < -DRAG_TRESHOLD) {
-      firstPage.style.transform = `translate3d(${
-        SLIDE_COUNT * clientWidth
-      }px, 0px, 0px)`;
+      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth
+        }px, 0px, 0px)`;
+    } else if (page === SLIDE_COUNT && dragDistance === 0) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setPage(0);
+        firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
+      }, 400);
     }
 
     if (page === 0 && dragDistance > DRAG_TRESHOLD) {
       setPage(SLIDE_COUNT);
 
-      firstPage.style.transform = `translate3d(${
-        SLIDE_COUNT * clientWidth
-      }px, 0px, 0px)`;
-    } else if (page === 1 && dragDistance === 0) {
-      setPage(1);
-      firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
+      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth
+        }px, 0px, 0px)`;
+    } else if (page === SLIDE_COUNT - 1 && dragDistance === 0) {
+      setTimeout(() => firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`, 200);
     }
-
-    setTimeout(() => {
-      if (page === SLIDE_COUNT && dragDistance === 0) {
-        setIsTransitioning(false);
-        setPage(0);
-        firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
-      }
-    }, 400);
   }, [clientWidth, dragDistance, isDragging, page]);
 
   return (
@@ -142,7 +137,7 @@ export function CarouselExample1() {
       role="region"
       aria-roledescription="carousel"
     >
-      <div className="overflow-clip">
+      <div className="overflow-cli">
         <div
           ref={carouselContentRef}
           className={cn(
@@ -153,9 +148,8 @@ export function CarouselExample1() {
             }
           )}
           style={{
-            transform: `translate3d(${
-              -page * clientWidth + dragDistance
-            }px, 0px, 0px)`,
+            transform: `translate3d(${-page * clientWidth + dragDistance
+              }px, 0px, 0px)`,
           }}
           tabIndex={-1}
           onPointerDown={handlePointerDown}
@@ -166,6 +160,7 @@ export function CarouselExample1() {
           {SLIDES.map((_, index) => (
             <div
               key={index}
+              id={`${index}`}
               className="min-w-0 flex-shrink-0 flex-grow-0 basis-full pl-4"
               role="group"
               aria-roledescription="slide"
