@@ -7,28 +7,24 @@ type CarouselIndicatorProps = ButtonProps & {
 };
 
 export function CarouselIndicator({
-  children,
-  reference: ref,
-  to,
+  variant = "outline",
+  to = 0,
   className,
   ...props
 }: CarouselIndicatorProps) {
-  const { handleClick } = useCarouselContext();
+  const { page, handleClick } = useCarouselContext();
 
   return (
     <Button
-      reference={ref}
-      role="tab"
-      aria-label={`page ${to}`}
-      aria-selected={false}
-      aria-controls={`carousel-item-${to}`}
-      tabIndex={-1}
-      size={"sm"}
-      onClick={() => handleClick(to as number)}
-      className={cn(
-        "bg-gray-50 h-[.2175rem] w-[1.875rem] border-0 rounded-none pointer-events-auto",
-        className
-      )}
+      onClick={() => handleClick(to)}
+      role={"tab"}
+      aria-label={`page ${to + 1}`}
+      aria-selected={page === to ? true : false}
+      aria-controls={`carousel-item-${to + 1}`}
+      variant={variant}
+      className={cn("rounded-full", className, {
+        "bg-gray-100": page === to,
+      })}
       {...props}
     />
   );

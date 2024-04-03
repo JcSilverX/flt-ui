@@ -6,49 +6,49 @@ type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {
   reference?: React.RefObject<HTMLDivElement>;
 };
 
-export function CarouselContent({
-  children,
-  className,
-  reference: ref,
-  ...props
-}: CarouselContentProps) {
+export function CarouselContent({ className, ...props }: CarouselContentProps) {
+  const { reference: ref } = props;
+
+  const { page, slideWidth, slide, fade, dragDistance, isDragging } =
+    useCarouselContext();
+
   const {
-    page,
-    isTransitioning,
-    carouselContentRef,
-    handleKeyDown,
-    handleMouseEnter,
-    handleMouseLeave,
+    carouselRef,
+    handlePointerEnter,
+    handlePointerLeave,
     handlePointerDown,
     handlePointerMove,
     handlePointerUp,
-    handleTransitionEnd,
+    handlePointerCancel,
   } = useCarouselContext();
 
   return (
     <div
-      ref={carouselContentRef}
-      className={cn(
-        "flex backface-hidden touch-pan-y transition-none duration-0",
-        className,
-        {
-          "transition-transform duration-700 ease-in-out": isTransitioning,
-        }
-      )}
-      {...props}
-      style={{
-        transform: `translateX(-${page * 100}%)`,
-      }}
+      ref={carouselRef}
+      className="overflow-clip"
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onKeyDown={handleKeyDown}
-      onTransitionEnd={handleTransitionEnd}
-      tabIndex={-1}
+      onPointerCancel={handlePointerCancel}
     >
-      {children}
+      <div
+        ref={ref}
+        style={{
+          transform: `translate3d(${
+            -page * slideWidth + dragDistance
+          }px, 0px, 0px)`,
+        }}
+        className={cn(
+          "backface-hidden flex touch-pan-x -ml-4 transition-transform duration-500 ease-in-out",
+          className,
+          {
+            "transition-none duration-0 ease-[none]": isDragging,
+          }
+        )}
+        {...props}
+      />
     </div>
   );
 }

@@ -1,256 +1,205 @@
 "use client";
 
-import Button from "@/components/button/button";
-import { useDebounce } from "@/lib/hooks/use-debounce";
 import cn from "@/lib/utils/cn";
 import { wrap } from "@/lib/utils/wrap";
+import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import React from "react";
+import { CarouselContent } from "../carousel-content";
+import {
+  CarouselControlNext,
+  CarouselControlPrevious,
+} from "../carousel-control";
+import { CarouselIndicator } from "../carousel-indicator";
+import { CarouselItem } from "../carousel-item";
+import CarouselContext, {
+  TKeyboardEvent,
+  TPointerEvent,
+} from "@/context/carousel-context-provider";
+import { useMeasure } from "@/lib/hooks/use-measure";
 
-const DRAG_TRESHOLD = 50 as const;
 const SLIDE_COUNT = 5 as const;
 const SLIDES = Array.from({ length: SLIDE_COUNT });
 
 export function CarouselExample1() {
-  // state
-  const [page, setPage] = React.useState<number>(0);
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const carouselContentRef = React.useRef<HTMLDivElement>(null);
-  // const { width: clientWidth } = useMeasure(carouselContentRef);
-  const [clientWidth, setClientWidth] = React.useState<number>(0);
-  const [isDragging, setIsDragging] = React.useState<boolean>(false);
-  const [dragStartX, setDragStartX] = React.useState<number>(0);
-  const [dragDistance, setDragDistance] = React.useState<number>(0);
-
-  // derived state
-  const debouncedDragDistance = useDebounce(dragDistance, 100);
-
-  // event handlers / actions
-  const paginate = React.useCallback(
-    (newDirection: number): void =>
-      setPage(wrap(0, SLIDE_COUNT + 1, page + newDirection)),
-    [page]
-  );
-
-  const handleNext = React.useCallback((): void => {
-    setIsTransitioning(true);
-    paginate(1);
-  }, [paginate]);
-
-  const handlePrev = React.useCallback((): void => {
-    setIsTransitioning(true);
-    paginate(-1);
-  }, [paginate]);
-
-  const handleKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "ArrowRight") {
-        handleNext();
-      } else if (event.key === "ArrowLeft") {
-        handlePrev();
-      }
-    },
-    [handleNext, handlePrev]
-  );
-
-  const handlePointerDown = React.useCallback(
-    (event: React.PointerEvent<HTMLDivElement>): void => {
-      setIsDragging(true);
-      setDragStartX(event.clientX);
-
-      event.currentTarget.setPointerCapture(event.pointerId);
-      event.preventDefault();
-    },
-    []
-  );
-
-  const handlePointerMove = React.useCallback(
-    (event: React.PointerEvent<HTMLDivElement>): void => {
-      if (!isDragging) return;
-
-      const newDistance = event.clientX - dragStartX;
-      setDragDistance(newDistance);
-
-      event.preventDefault();
-    },
-    [dragStartX, isDragging]
-  );
-
-  const handlePointerUp = React.useCallback(
-    (event: React.PointerEvent<HTMLDivElement>): void => {
-      setIsDragging(false);
-
-      if (dragDistance < -DRAG_TRESHOLD) {
-        handleNext();
-      } else if (dragDistance > DRAG_TRESHOLD) {
-        handlePrev();
-      }
-
-      setDragDistance(0);
-
-      event.currentTarget.releasePointerCapture(event.pointerId);
-      event.preventDefault();
-    },
-    [dragDistance, handleNext, handlePrev]
-  );
-
-  // useEffect
-  React.useEffect(() => {
-    const carouselContent = carouselContentRef.current;
-
-    if (!carouselContent) return;
-
-    setClientWidth(carouselContent.clientWidth);
-  }, []);
-
-  /// !!
-  React.useEffect(() => {
-    const carouselContent = carouselContentRef.current;
-
-    if (!carouselContent) return;
-
-    const firstPage = carouselContent.children[0] as HTMLDivElement;
-
-    if (page === SLIDE_COUNT - 1 && dragDistance < -DRAG_TRESHOLD) {
-      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth
-        }px, 0px, 0px)`;
-    }
-    setTimeout(() => {
-      if (page === SLIDE_COUNT && dragDistance === 0) {
-        setIsTransitioning(false);
-        setPage(0);
-        firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`;
-      }
-    }, 400);
-
-    if (page === 0 && dragDistance > DRAG_TRESHOLD) {
-      setPage(SLIDE_COUNT);
-
-      firstPage.style.transform = `translate3d(${SLIDE_COUNT * clientWidth
-        }px, 0px, 0px)`;
-    } else if (page === SLIDE_COUNT - 1 && dragDistance === 0) {
-      setTimeout(() => firstPage.style.transform = `translate3d(${0}px, 0px, 0px)`, 200);
-    }
-  }, [clientWidth, dragDistance, isDragging, page]);
-
   return (
-    <div
-      className="relative w-full max-w-xs mx-auto"
-      role="region"
-      aria-roledescription="carousel"
-    >
-      <div className="overflow-clip">
-        <div
-          ref={carouselContentRef}
-          className={cn(
-            "backface-hidden flex touch-pan-y -ml-4 transition-transform duration-500 ease-in-out",
-            {
-              "transition-none duration-0 ease-[none]":
-                isDragging || !isTransitioning,
-            }
-          )}
-          style={{
-            transform: `translate3d(${-page * clientWidth + dragDistance
-              }px, 0px, 0px)`,
-          }}
-          tabIndex={-1}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onKeyDown={handleKeyDown}
-        >
-          {SLIDES.map((_, index) => (
-            <div
-              key={index}
-              id={`${index}`}
-              className="min-w-0 flex-shrink-0 flex-grow-0 basis-full pl-4"
-              role="group"
-              aria-roledescription="slide"
-            >
-              <div className="pl-1">
-                <div className="rounded-xl border shadow">
-                  <div className="flex aspect-square items-center justify-center p-6">
-                    <span className="text-4xl font-semibold">{index + 1}</span>
-                  </div>
+    <Carousel className="w-full max-w-md mx-auto">
+      <div className="flex justify-center space-x-2">
+        {SLIDES.map((_, index) => (
+          <CarouselIndicator key={index} to={index} />
+        ))}
+      </div>
+
+      <CarouselContent>
+        {SLIDES.map((_, index) => (
+          <CarouselItem key={index} id={`${index + 1}`}>
+            <div className="pl-1">
+              <div className="rounded-xl border shadow">
+                <div className="flex aspect-video items-center justify-center p-6">
+                  <span className="text-4xl font-semibold">{index + 1}</span>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
 
-      <Button onClick={handlePrev}>{"<"}</Button>
-      <Button onClick={handleNext}>{">"}</Button>
-    </div>
+      <CarouselControlPrevious>
+        <ChevronLeftIcon width={24} height={24} />
+      </CarouselControlPrevious>
+      <CarouselControlNext>
+        <ChevronRightIcon width={24} height={24} />
+      </CarouselControlNext>
+    </Carousel>
   );
 }
 
-// custom hooks
-export type TSize = {
-  width: number | undefined;
-  height: number | undefined;
+type CarouselProps = React.HTMLAttributes<HTMLDivElement> & {
+  reference?: React.RefObject<HTMLDivElement>;
+  activeIndex?: number;
+  keyboard?: boolean;
+  touch?: boolean;
+  interval?: number;
+  loop?: boolean;
+  pause?: boolean;
+  orientation?: "horizontal" | "vertical";
+  slide?: boolean;
+  fade?: boolean;
 };
 
-const initialSize: TSize = {
-  width: undefined,
-  height: undefined,
-};
+export function Carousel({
+  activeIndex = 0,
+  keyboard,
+  touch,
+  interval = 5000,
+  loop,
+  pause,
+  orientation,
+  slide = true,
+  fade,
+  className,
+  ...props
+}: CarouselProps) {
+  const { children, reference: ref } = props;
 
-function useMeasure(ref: React.RefObject<HTMLElement>) {
-  const [{ width, height }, setSize] = React.useState<TSize>(initialSize);
+  // state
+  const [page, setPage] = React.useState<number>(activeIndex);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+  const { width = 0 } = useMeasure(carouselRef);
+  const [isTransitioning, setIsTransitioning] = React.useState<boolean>(false);
 
-  React.useEffect(() => {
-    const refx = ref.current;
+  // drag state
+  const [isDragging, setIsDragging] = React.useState<boolean>(false);
+  const [dragStartX, setDragStartX] = React.useState<number>(0);
+  const [dragDistance, setDragDistance] = React.useState<number>(0);
+  const [startTime, setStartTime] = React.useState<number>(0);
 
-    if (!refx) return;
+  // derived state
+  const slideWidth = width + 16;
 
-    setSize({ width: refx.clientWidth, height: refx.clientHeight });
-  }, [ref]);
+  // event handlers / actions
+  const paginate = React.useCallback(
+    (newDirection: number): void => {
+      setPage(wrap(0, SLIDE_COUNT, page + newDirection));
+    },
+    [page]
+  );
 
-  return { width, height };
+  const handlePrev = (): void => paginate(-1);
+
+  const handleNext = (): void => paginate(1);
+
+  const handleClick = (newDirection: number): void => setPage(newDirection);
+
+  const handleKeyDown = (evt: TKeyboardEvent): void => {
+    if (evt.key === "ArrowLeft") {
+      evt.preventDefault();
+      paginate(-1);
+    } else if (evt.key === "ArrowRight") {
+      evt.preventDefault();
+      paginate(1);
+    }
+  };
+
+  const handlePointerEnter = (evt: TPointerEvent): void => {};
+
+  const handlePointerLeave = (evt: TPointerEvent): void => {};
+
+  const handlePointerDown = (evt: TPointerEvent): void => {
+    setIsDragging(true);
+    setDragStartX(evt.clientX);
+    setStartTime(new Date().getTime());
+
+    evt.currentTarget.setPointerCapture(evt.pointerId);
+    evt.preventDefault();
+  };
+
+  const handlePointerMove = (evt: TPointerEvent): void => {
+    if (!isDragging) return;
+
+    const newDistance = evt.clientX - dragStartX;
+    setDragDistance(newDistance);
+
+    evt.preventDefault();
+  };
+
+  const handlePointerUp = (evt: TPointerEvent): void => {
+    setIsDragging(false);
+
+    const nowTime = new Date().getTime();
+    const diffTime = nowTime - startTime;
+    const velocity = Math.abs(dragDistance / diffTime);
+
+    const isGesture = velocity > 0.5;
+
+    if (isGesture) {
+      if (dragDistance > 0) {
+        paginate(-1);
+      } else {
+        paginate(1);
+      }
+    }
+
+    setDragDistance(0);
+
+    evt.currentTarget.releasePointerCapture(evt.pointerId);
+    evt.preventDefault();
+  };
+
+  const handlePointerCancel = (evt: TPointerEvent): void => {
+    setIsDragging(false);
+    setDragDistance(0);
+  };
+
+  return (
+    <CarouselContext.Provider
+      value={{
+        page,
+        carouselRef,
+        slideWidth,
+        isTransitioning,
+        slide,
+        fade,
+        dragDistance,
+        isDragging,
+        handlePrev,
+        handleNext,
+        handleClick,
+        handlePointerEnter,
+        handlePointerLeave,
+        handlePointerDown,
+        handlePointerMove,
+        handlePointerUp,
+        handlePointerCancel,
+      }}
+    >
+      <div
+        ref={ref}
+        onKeyDownCapture={handleKeyDown}
+        className={cn("relative", className)}
+        role="region"
+        aria-roledescription="carousel"
+        {...props}
+      />
+    </CarouselContext.Provider>
+  );
 }
-
-// type CarouselControlProps = ButtonProps;
-
-// function CarouselControl({
-//   variant = "ghost",
-//   className,
-//   ...props
-// }: CarouselControlProps) {
-//   return (
-//     <Button
-//       variant={variant}
-//       className={cn(
-//         "absolute inset-y-0 my-auto z-10 text-gray-950/50 hover:bg-transparent",
-//         className
-//       )}
-//       {...props}
-//     />
-//   );
-// }
-
-// React.useEffect(() => {
-//   const carouselContent = carouselContentRef.current;
-
-//   if (!carouselContent) return;
-
-//   const firstChild = carouselContent.children[0] as HTMLDivElement;
-//   const lastChild = carouselContent.children[
-//     carouselContent.children.length - 1
-//   ] as HTMLDivElement;
-
-//   if (page === 0 && dragDistance) {
-//     lastChild.style.transform = `translate3d(${
-//       -SLIDE_COUNT * clientWidth
-//     }px, 0px, 0px)`;
-//   } else {
-//     lastChild.style.transform = `translate3d(${0}px, 0px, 0px)`;
-//   }
-
-//   if (page === SLIDE_COUNT - 1 && dragDistance) {
-//     firstChild.style.transform = `translate3d(${
-//       SLIDE_COUNT * clientWidth
-//     }px, 0px, 0px)`;
-//   } else {
-//     firstChild.style.transform = `translate3d(${0}px, 0px, 0px)`;
-//   }
-// }, [clientWidth, dragDistance, page]);

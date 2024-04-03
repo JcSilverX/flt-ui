@@ -2,18 +2,27 @@
 
 import { createContext } from "react";
 
+export type TKeyboardEvent = React.KeyboardEvent<HTMLDivElement>;
+export type TPointerEvent = React.PointerEvent<HTMLDivElement>;
+
 type TCarouselContext = {
   page: number;
+  carouselRef: React.RefObject<HTMLDivElement>;
+  slideWidth: number;
   isTransitioning: boolean;
-  carouselContentRef: React.RefObject<HTMLDivElement>;
+  slide?: boolean;
+  fade?: boolean;
+  dragDistance: number;
+  isDragging: boolean;
+  handlePrev: () => void;
+  handleNext: () => void;
   handleClick: (newDirection: number) => void;
-  handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-  handleMouseEnter: () => void;
-  handleMouseLeave: () => void;
-  handlePointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
-  handlePointerMove: (event: React.PointerEvent<HTMLDivElement>) => void;
-  handlePointerUp: (event: React.PointerEvent<HTMLDivElement>) => void;
-  handleTransitionEnd: () => void;
+  handlePointerEnter: (evt: TPointerEvent) => void;
+  handlePointerLeave: (evt: TPointerEvent) => void;
+  handlePointerDown: (evt: TPointerEvent) => void;
+  handlePointerMove: (evt: TPointerEvent) => void;
+  handlePointerUp: (evt: TPointerEvent) => void;
+  handlePointerCancel: (evt: TPointerEvent) => void;
 };
 
 const CarouselContext = createContext<TCarouselContext | null>(null);
