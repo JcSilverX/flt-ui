@@ -95,6 +95,8 @@ export function Carousel({
 
   // derived state
   const slideWidth = width + 16;
+  const canScrollPrev = loop || page > 0;
+  const canScrollNext = loop || page < SLIDE_COUNT - 1;
 
   // event handlers / actions
   const paginate = React.useCallback(
@@ -104,9 +106,13 @@ export function Carousel({
     [page]
   );
 
-  const handlePrev = (): void => paginate(-1);
+  const handlePrev = (): void => {
+    paginate(-1);
+  };
 
-  const handleNext = (): void => paginate(1);
+  const handleNext = (): void => {
+    paginate(1);
+  };
 
   const handleClick = (newDirection: number): void => setPage(newDirection);
 
@@ -152,10 +158,10 @@ export function Carousel({
     const isGesture = velocity > 0.5;
 
     if (isGesture) {
-      if (dragDistance > 0) {
-        paginate(-1);
-      } else {
-        paginate(1);
+      if (dragDistance > 0 && canScrollPrev) {
+        handlePrev();
+      } else if (dragDistance < 0 && canScrollNext) {
+        handleNext();
       }
     }
 
@@ -181,6 +187,8 @@ export function Carousel({
         fade,
         dragDistance,
         isDragging,
+        canScrollPrev,
+        canScrollNext,
         handlePrev,
         handleNext,
         handleClick,

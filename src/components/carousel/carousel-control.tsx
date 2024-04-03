@@ -8,7 +8,7 @@ export function CarouselControlPrevious({
   className,
   ...props
 }: CarouselControlProps) {
-  const { handlePrev } = useCarouselContext();
+  const { handlePrev, canScrollPrev } = useCarouselContext();
 
   return (
     <CarouselControl
@@ -16,6 +16,7 @@ export function CarouselControlPrevious({
       className={cn("left-0", className, {})}
       aria-label="carousel items"
       aria-controls="previous page"
+      disabled={!canScrollPrev}
       {...props}
     />
   );
@@ -25,7 +26,7 @@ export function CarouselControlNext({
   className,
   ...props
 }: CarouselControlProps) {
-  const { handleNext } = useCarouselContext();
+  const { handleNext, canScrollNext } = useCarouselContext();
 
   return (
     <CarouselControl
@@ -33,6 +34,7 @@ export function CarouselControlNext({
       className={cn("right-0", className, {})}
       aria-label="carousel items"
       aria-controls="next page"
+      disabled={!canScrollNext}
       {...props}
     />
   );

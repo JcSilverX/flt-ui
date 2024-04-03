@@ -14,6 +14,8 @@ type TCarouselContext = {
   fade?: boolean;
   dragDistance: number;
   isDragging: boolean;
+  canScrollPrev: boolean;
+  canScrollNext: boolean;
   handlePrev: () => void;
   handleNext: () => void;
   handleClick: (newDirection: number) => void;
