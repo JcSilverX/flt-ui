@@ -22,7 +22,7 @@ const SLIDES = Array.from({ length: SLIDE_COUNT });
 
 export function CarouselExample1() {
   return (
-    <Carousel className="w-full max-w-md mx-auto" autoPlay>
+    <Carousel className="w-full max-w-md mx-auto">
       <div className="flex justify-center space-x-2">
         {SLIDES.map((_, index) => (
           <CarouselIndicator key={index} to={index} />
@@ -73,7 +73,7 @@ export function Carousel({
   keyboard,
   touch,
   interval = 5000,
-  autoPlay,
+  autoPlay = false,
   loop,
   pause,
   direction = "forward",
@@ -90,6 +90,7 @@ export function Carousel({
   const carouselRef = React.useRef<HTMLDivElement>(null);
   const { width = 0 } = useMeasure(carouselRef);
   const [isTransitioning, setIsTransitioning] = React.useState<boolean>(false);
+  const [isAutoPlaying, setIsAutoPlaying] = React.useState<boolean>(autoPlay);
 
   // drag state
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
@@ -130,9 +131,11 @@ export function Carousel({
     }
   };
 
-  const handlePointerEnter = (evt: TPointerEvent): void => {};
+  const handlePointerEnter = (evt: TPointerEvent): void =>
+    setIsAutoPlaying(false);
 
-  const handlePointerLeave = (evt: TPointerEvent): void => {};
+  const handlePointerLeave = (evt: TPointerEvent): void =>
+    setIsAutoPlaying(autoPlay && !isAutoPlaying);
 
   const handlePointerDown = (evt: TPointerEvent): void => {
     setIsDragging(true);
@@ -181,6 +184,19 @@ export function Carousel({
   };
 
   // useEffect
+  React.useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const intervalId = setInterval(() => {
+      if (direction === "backward") {
+        handlePrev();
+      } else if (direction === "forward") {
+        handleNext();
+      }
+    }, interval);
+
+    return () => clearInterval(intervalId);
+  }, [direction, handleNext, handlePrev, interval, isAutoPlaying]);
 
   return (
     <CarouselContext.Provider
