@@ -20,7 +20,6 @@ export function useMeasure<T extends HTMLElement>(ref: React.RefObject<T>) {
 
     const observer = new ResizeObserver((entries) => {
       const { width, height } = entries[0].contentRect;
-      console.log(entries);
 
       setDimensions({ width, height });
     });
