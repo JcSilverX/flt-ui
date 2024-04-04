@@ -76,7 +76,6 @@ export function Carousel({
   direction = "forward",
   orientation = "horizontal",
   slide = true,
-
   className,
   ...props
 }: CarouselProps) {
