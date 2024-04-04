@@ -9,15 +9,8 @@ type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {
 export function CarouselContent({ className, ...props }: CarouselContentProps) {
   const { reference: ref } = props;
 
-  const {
-    page,
-    dimension,
-    isTransitioning,
-    slide,
-    fade,
-    dragDistance,
-    isDragging,
-  } = useCarouselContext();
+  const { page, dimension, isTransitioning, slide, dragDistance, isDragging } =
+    useCarouselContext();
 
   const {
     carouselRef,
@@ -53,7 +46,7 @@ export function CarouselContent({ className, ...props }: CarouselContentProps) {
           "backface-hidden flex transition-transform duration-500 ease-in-out",
           className,
           {
-            "transition-none duration-0 ease-[none]": isDragging,
+            "transition-none duration-0 ease-[none]": isDragging || !slide,
             "touch-pan-x -ml-4": orientation === "horizontal",
             "flex-col touch-pan-y -mt-1": orientation === "vertical",
           }

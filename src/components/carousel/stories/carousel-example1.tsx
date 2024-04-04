@@ -22,7 +22,7 @@ const SLIDES = Array.from({ length: SLIDE_COUNT });
 
 export function CarouselExample1() {
   return (
-    <Carousel className="w-full max-w-md mx-auto">
+    <Carousel className="w-full max-w-md mx-auto" autoPlay>
       <div className="flex justify-center space-x-2">
         {SLIDES.map((_, index) => (
           <CarouselIndicator key={index} to={index} />
@@ -65,7 +65,6 @@ type CarouselProps = React.HTMLAttributes<HTMLDivElement> & {
   direction?: "backward" | "forward";
   orientation?: "horizontal" | "vertical";
   slide?: boolean;
-  fade?: boolean;
 };
 
 export function Carousel({
@@ -79,7 +78,7 @@ export function Carousel({
   direction = "forward",
   orientation = "horizontal",
   slide = true,
-  fade,
+
   className,
   ...props
 }: CarouselProps) {
@@ -217,7 +216,6 @@ export function Carousel({
         dimension,
         isTransitioning,
         slide,
-        fade,
         dragDistance,
         isDragging,
         canScrollPrev,
