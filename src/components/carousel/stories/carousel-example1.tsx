@@ -122,6 +122,8 @@ export function Carousel({
   const handleClick = (newDirection: number): void => setPage(newDirection);
 
   const handleKeyDown = (evt: TKeyboardEvent): void => {
+    if (!keyboard) return;
+
     if (evt.key === "ArrowLeft") {
       evt.preventDefault();
       paginate(-1);
