@@ -61,7 +61,6 @@ type CarouselProps = React.HTMLAttributes<HTMLDivElement> & {
   interval?: number;
   autoPlay?: boolean;
   loop?: boolean;
-  pause?: boolean;
   direction?: "backward" | "forward";
   orientation?: "horizontal" | "vertical";
   slide?: boolean;
@@ -74,7 +73,6 @@ export function Carousel({
   interval = 5000,
   autoPlay = false,
   loop,
-  pause,
   direction = "forward",
   orientation = "horizontal",
   slide = true,
