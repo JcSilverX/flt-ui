@@ -8,7 +8,7 @@ export type TPointerEvent = React.PointerEvent<HTMLDivElement>;
 type TCarouselContext = {
   page: number;
   carouselRef: React.RefObject<HTMLDivElement>;
-  slideWidth: number;
+  dimension: number;
   isTransitioning: boolean;
   slide?: boolean;
   fade?: boolean;
@@ -16,6 +16,7 @@ type TCarouselContext = {
   isDragging: boolean;
   canScrollPrev: boolean;
   canScrollNext: boolean;
+  orientation?: "horizontal" | "vertical";
   handlePrev: () => void;
   handleNext: () => void;
   handleClick: (newDirection: number) => void;

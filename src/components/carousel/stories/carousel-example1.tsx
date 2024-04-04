@@ -77,7 +77,7 @@ export function Carousel({
   loop,
   pause,
   direction = "forward",
-  orientation,
+  orientation = "horizontal",
   slide = true,
   fade,
   className,
@@ -88,18 +88,18 @@ export function Carousel({
   // state
   const [page, setPage] = React.useState<number>(activeIndex);
   const carouselRef = React.useRef<HTMLDivElement>(null);
-  const { width = 0 } = useMeasure(carouselRef);
+  const { width = 0, height = 0 } = useMeasure(carouselRef);
   const [isTransitioning, setIsTransitioning] = React.useState<boolean>(false);
   const [isAutoPlaying, setIsAutoPlaying] = React.useState<boolean>(autoPlay);
 
   // drag state
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
-  const [dragStartX, setDragStartX] = React.useState<number>(0);
+  const [dragStart, setDragStart] = React.useState<number>(0);
   const [dragDistance, setDragDistance] = React.useState<number>(0);
   const [startTime, setStartTime] = React.useState<number>(0);
 
   // derived state
-  const slideWidth = width + 16;
+  const dimension = orientation === "horizontal" ? width + 16 : height;
   const canScrollPrev = loop || page > 0;
   const canScrollNext = loop || page < SLIDE_COUNT - 1;
 
@@ -139,7 +139,13 @@ export function Carousel({
 
   const handlePointerDown = (evt: TPointerEvent): void => {
     setIsDragging(true);
-    setDragStartX(evt.clientX);
+
+    if (orientation === "horizontal") {
+      setDragStart(evt.clientX);
+    } else if (orientation === "vertical") {
+      setDragStart(evt.clientY);
+    }
+
     setStartTime(new Date().getTime());
 
     evt.currentTarget.setPointerCapture(evt.pointerId);
@@ -149,7 +155,10 @@ export function Carousel({
   const handlePointerMove = (evt: TPointerEvent): void => {
     if (!isDragging) return;
 
-    const newDistance = evt.clientX - dragStartX;
+    const newDistance =
+      orientation === "horizontal"
+        ? evt.clientX - dragStart
+        : evt.clientY - dragStart;
     setDragDistance(newDistance);
 
     evt.preventDefault();
@@ -203,7 +212,7 @@ export function Carousel({
       value={{
         page,
         carouselRef,
-        slideWidth,
+        dimension,
         isTransitioning,
         slide,
         fade,
@@ -211,6 +220,7 @@ export function Carousel({
         isDragging,
         canScrollPrev,
         canScrollNext,
+        orientation,
         handlePrev,
         handleNext,
         handleClick,

@@ -11,7 +11,7 @@ export function CarouselContent({ className, ...props }: CarouselContentProps) {
 
   const {
     page,
-    slideWidth,
+    dimension,
     isTransitioning,
     slide,
     fade,
@@ -27,6 +27,7 @@ export function CarouselContent({ className, ...props }: CarouselContentProps) {
     handlePointerMove,
     handlePointerUp,
     handlePointerCancel,
+    orientation,
   } = useCarouselContext();
 
   return (
@@ -43,15 +44,18 @@ export function CarouselContent({ className, ...props }: CarouselContentProps) {
       <div
         ref={ref}
         style={{
-          transform: `translate3d(${
-            -page * slideWidth + dragDistance
-          }px, 0px, 0px)`,
+          transform:
+            orientation === "horizontal"
+              ? `translate3d(${-page * dimension + dragDistance}px, 0px, 0px)`
+              : `translate3d(0px, ${-page * dimension + dragDistance}px, 0px)`,
         }}
         className={cn(
-          "backface-hidden flex touch-pan-x -ml-4 transition-transform duration-500 ease-in-out",
+          "backface-hidden flex transition-transform duration-500 ease-in-out",
           className,
           {
             "transition-none duration-0 ease-[none]": isDragging,
+            "touch-pan-x -ml-4": orientation === "horizontal",
+            "flex-col touch-pan-y -mt-1": orientation === "vertical",
           }
         )}
         {...props}

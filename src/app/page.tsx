@@ -3,6 +3,7 @@ import { AlertExample1 } from "@/components/alert/alert";
 import { Example4 } from "@/components/avatar/avatar";
 import Button from "@/components/button/button";
 import { CarouselExample1 } from "@/components/carousel/stories/carousel-example1";
+import CarouselExample2 from "@/components/carousel/stories/carousel-example2";
 import { Example1 } from "@/components/dialog/dialog";
 
 export default function Home() {
@@ -31,6 +32,7 @@ export default function Home() {
 
       {/* Carousel */}
       <CarouselExample1 />
+      <CarouselExample2 />
     </main>
   );
 }
