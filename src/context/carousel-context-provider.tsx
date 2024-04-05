@@ -9,7 +9,6 @@ type TCarouselContext = {
   page: number;
   carouselRef: React.RefObject<HTMLDivElement>;
   dimension: number;
-  isTransitioning: boolean;
   slide?: boolean;
   fade?: boolean;
   dragDistance: number;

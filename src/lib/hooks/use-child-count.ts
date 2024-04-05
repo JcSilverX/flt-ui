@@ -7,7 +7,7 @@ export function useChildCount(ref: React.RefObject<HTMLElement>) {
     const parentElement = ref.current!;
 
     // guard against `ref.current` being null.
-    if (!parentElement || parentElement.childElementCount === 0) return;
+    if (!parentElement) return;
 
     setNumberOfCols(parentElement.childElementCount);
   }, [ref]);

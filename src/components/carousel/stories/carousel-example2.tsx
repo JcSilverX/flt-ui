@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Carousel } from "./carousel-example1";
+
 import { CarouselContent } from "../carousel-content";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import {
@@ -9,6 +9,7 @@ import {
 } from "../carousel-control";
 import { CarouselIndicator } from "../carousel-indicator";
 import { CarouselItem } from "../carousel-item";
+import Carousel from "../carousel";
 
 const SLIDE_COUNT = 5 as const;
 const SLIDES = Array.from({ length: SLIDE_COUNT });

@@ -1,254 +1,211 @@
 "use client";
 
-import React from "react";
+import CarouselContext, {
+  TKeyboardEvent,
+  TPointerEvent,
+} from "@/context/carousel-context-provider";
+import { useMeasure } from "@/lib/hooks/use-measure";
 import cn from "@/lib/utils/cn";
-import CarouselContext from "@/context/carousel-context-provider";
-import { useChildCount } from "@/lib/hooks/use-child-count";
-import { wrap } from "@/lib/utils/wrap";
-import { CarouselControl } from "./carousel-control";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-
-const TRESHOLD = 50 as const;
+import { wrap } from "framer-motion";
+import React from "react";
 
 type CarouselProps = React.HTMLAttributes<HTMLDivElement> & {
+  reference?: React.RefObject<HTMLDivElement>;
   activeIndex?: number;
-  controls?: boolean;
   keyboard?: boolean;
   touch?: boolean;
   interval?: number;
+  autoPlay?: boolean;
   loop?: boolean;
-  reference?: React.RefObject<HTMLDivElement>;
+  direction?: "backward" | "forward";
+  orientation?: "horizontal" | "vertical";
+  slide?: boolean;
 };
 
 export default function Carousel({
-  children,
-  activeIndex = 1,
-  controls = true,
+  activeIndex = 0,
   keyboard,
   touch,
   interval = 5000,
+  autoPlay = false,
   loop,
+  direction = "forward",
+  orientation = "horizontal",
+  slide = true,
   className,
-  reference: ref,
   ...props
 }: CarouselProps) {
+  const { children, reference: ref } = props;
+
   // state
   const [page, setPage] = React.useState<number>(activeIndex);
-  const [isTransitioning, setIsTransitioning] = React.useState<boolean>(false);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+  const { width = 0, height = 0 } = useMeasure(carouselRef);
+  const [isAutoPlaying, setIsAutoPlaying] = React.useState<boolean>(autoPlay);
+
+  // drag state
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
-  const [dragStartX, setDragStartX] = React.useState<number>(0);
+  const [dragStart, setDragStart] = React.useState<number>(0);
   const [dragDistance, setDragDistance] = React.useState<number>(0);
-  const carouselContentRef = React.useRef<HTMLDivElement>(null);
-  const isClonedRef = React.useRef<boolean>(false);
-  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
-  const childCount = useChildCount(carouselContentRef);
+  const [startTime, setStartTime] = React.useState<number>(0);
+
+  let slideCount = 1;
+
+  forEach(children, (child, index) => slideCount++);
 
   // derived state
+  const dimension = orientation === "horizontal" ? width + 16 : height;
+  const canScrollPrev = loop || page > 0;
+  const canScrollNext = loop || page < slideCount - 1;
 
   // event handlers / actions
   const paginate = React.useCallback(
-    (newDirection: number): void =>
-      setPage(wrap(0, childCount, page + newDirection)),
-    [childCount, page]
+    (newDirection: number): void => {
+      setPage(wrap(0, slideCount, page + newDirection));
+    },
+    [slideCount, page]
   );
 
-  const startAutoPlay = React.useCallback((): void => {
-    intervalRef.current = setInterval(() => {
-      setIsTransitioning(true);
-      paginate(1);
-    }, interval);
-  }, [interval, paginate]);
-
-  const stopAutoPlay = React.useCallback((): void => {
-    if (!intervalRef.current) return;
-
-    clearInterval(intervalRef.current);
-  }, []);
-
-  const handleNext = React.useCallback((): void => {
-    setIsTransitioning(true);
-
-    paginate(1);
-  }, [paginate]);
-
   const handlePrev = React.useCallback((): void => {
-    setIsTransitioning(true);
-
     paginate(-1);
   }, [paginate]);
 
-  const handleClick = React.useCallback((newDirection: number): void => {
-    setIsTransitioning(true);
+  const handleNext = React.useCallback((): void => {
+    paginate(1);
+  }, [paginate]);
 
-    setPage(newDirection);
-  }, []);
+  const handleClick = (newDirection: number): void => setPage(newDirection);
 
-  const handleKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>): void => {
-      if (!keyboard) return;
+  const handleKeyDown = (evt: TKeyboardEvent): void => {
+    if (!keyboard) return;
 
-      setIsTransitioning(true);
+    if (evt.key === "ArrowLeft") {
+      evt.preventDefault();
+      paginate(-1);
+    } else if (evt.key === "ArrowRight") {
+      evt.preventDefault();
+      paginate(1);
+    }
+  };
 
-      if (event.key === "ArrowRight") {
-        paginate(1);
-      } else if (event.key === "ArrowLeft") {
-        paginate(-1);
+  const handlePointerEnter = (evt: TPointerEvent): void =>
+    setIsAutoPlaying(false);
+
+  const handlePointerLeave = (evt: TPointerEvent): void =>
+    setIsAutoPlaying(autoPlay && !isAutoPlaying);
+
+  const handlePointerDown = (evt: TPointerEvent): void => {
+    setIsDragging(true);
+
+    if (orientation === "horizontal") {
+      setDragStart(evt.clientX);
+    } else if (orientation === "vertical") {
+      setDragStart(evt.clientY);
+    }
+
+    setStartTime(new Date().getTime());
+
+    evt.currentTarget.setPointerCapture(evt.pointerId);
+    evt.preventDefault();
+  };
+
+  const handlePointerMove = (evt: TPointerEvent): void => {
+    if (!isDragging) return;
+
+    const newDistance =
+      orientation === "horizontal"
+        ? evt.clientX - dragStart
+        : evt.clientY - dragStart;
+    setDragDistance(newDistance);
+
+    evt.preventDefault();
+  };
+
+  const handlePointerUp = (evt: TPointerEvent): void => {
+    setIsDragging(false);
+
+    const nowTime = new Date().getTime();
+    const diffTime = nowTime - startTime;
+    const velocity = Math.abs(dragDistance / diffTime);
+
+    const isGesture = velocity > 0.5;
+
+    if (isGesture) {
+      if (dragDistance > 0 && canScrollPrev) {
+        handlePrev();
+      } else if (dragDistance < 0 && canScrollNext) {
+        handleNext();
       }
-    },
-    [keyboard, paginate]
-  );
-
-  const handleMouseEnter = React.useCallback((): void => {
-    const carouselContent = carouselContentRef.current;
-
-    if (!carouselContent) return;
-
-    carouselContentRef.current.focus();
-
-    if (loop) {
-      stopAutoPlay();
     }
-  }, [loop, stopAutoPlay]);
 
-  const handleMouseLeave = React.useCallback((): void => {
-    const carouselContent = carouselContentRef.current;
+    setDragDistance(0);
 
-    if (!carouselContent) return;
+    evt.currentTarget.releasePointerCapture(evt.pointerId);
+    evt.preventDefault();
+  };
 
-    carouselContentRef.current.blur();
+  const handlePointerCancel = (evt: TPointerEvent): void => {
+    setIsDragging(false);
+    setDragDistance(0);
+  };
 
-    if (loop) {
-      startAutoPlay();
-    }
-  }, [startAutoPlay, loop]);
+  // useEffect
+  React.useEffect(() => {
+    if (!isAutoPlaying) return;
 
-  const handlePointerDown = React.useCallback(
-    (event: React.PointerEvent<HTMLDivElement>): void => {
-      setIsDragging(true);
-      setDragStartX(event.clientX);
-      setDragDistance(0);
-    },
-    []
-  );
-
-  const handlePointerMove = React.useCallback(
-    (event: React.PointerEvent<HTMLDivElement>): void => {
-      if (!isDragging) return;
-
-      const newDistance = event.clientX - dragStartX;
-      setDragDistance(newDistance);
-    },
-    [dragStartX, isDragging]
-  );
-
-  const handlePointerUp = React.useCallback(
-    (event: React.PointerEvent<HTMLDivElement>): void => {
-      const carouselContent = carouselContentRef.current;
-
-      if (!carouselContent) return;
-
-      if (!isDragging) return;
-
-      setIsDragging(false);
-      setIsTransitioning(true);
-
-      if (dragDistance > TRESHOLD) {
-        paginate(-1);
-      } else if (dragDistance < -TRESHOLD) {
-        paginate(1);
+    const intervalId = setInterval(() => {
+      if (direction === "backward") {
+        handlePrev();
+      } else if (direction === "forward") {
+        handleNext();
       }
+    }, interval);
 
-      setDragDistance(0);
-    },
-    [dragDistance, isDragging, paginate]
-  );
-
-  const handleTransitionEnd = React.useCallback((): void => {
-    const carouselContent = carouselContentRef.current;
-
-    if (!carouselContent) return;
-
-    if (page === 0) {
-      setIsTransitioning(false);
-      setPage(carouselContent.children.length - 2);
-    }
-
-    if (page === carouselContent.children.length - 1) {
-      setIsTransitioning(false);
-      setPage(1);
-    }
-  }, [page]);
-
-  React.useEffect(() => {
-    const carouselContent = carouselContentRef.current;
-
-    if (!carouselContent || isClonedRef.current) return;
-
-    carouselContent.prepend(
-      carouselContent.children[carouselContent.children.length - 1].cloneNode(
-        true
-      )
-    );
-
-    carouselContent.append(carouselContent.children[1].cloneNode(true));
-
-    isClonedRef.current = true;
-  }, []);
-
-  React.useEffect(() => {
-    if (!loop) return;
-
-    startAutoPlay();
-
-    return () => stopAutoPlay();
-  }, [startAutoPlay, loop, stopAutoPlay]);
+    return () => clearInterval(intervalId);
+  }, [direction, handleNext, handlePrev, interval, isAutoPlaying]);
 
   return (
     <CarouselContext.Provider
       value={{
         page,
-        isTransitioning,
-        carouselContentRef,
+        carouselRef,
+        dimension,
+        slide,
+        dragDistance,
+        isDragging,
+        canScrollPrev,
+        canScrollNext,
+        orientation,
+        handlePrev,
+        handleNext,
         handleClick,
-        handleKeyDown,
-        handleMouseEnter,
-        handleMouseLeave,
+        handlePointerEnter,
+        handlePointerLeave,
         handlePointerDown,
         handlePointerMove,
         handlePointerUp,
-        handleTransitionEnd,
+        handlePointerCancel,
       }}
     >
       <div
         ref={ref}
-        aria-live="off"
-        className={cn("relative overflow-clip", className)}
+        onKeyDownCapture={handleKeyDown}
+        className={cn("relative", className)}
+        role="region"
+        aria-roledescription="carousel"
         {...props}
-      >
-        {children}
-
-        {controls && (
-          <>
-            {/* controls */}
-            <CarouselControl
-              onClick={handlePrev}
-              className="left-0"
-              aria-label="carousel items"
-              aria-controls="previous page"
-            >
-              <ChevronLeftIcon width={32} height={32} />
-            </CarouselControl>
-            <CarouselControl
-              onClick={handleNext}
-              className="right-0"
-              aria-label="carousel items"
-              aria-controls="next page"
-            >
-              <ChevronRightIcon width={32} height={32} />
-            </CarouselControl>
-          </>
-        )}
-      </div>
+      />
     </CarouselContext.Provider>
   );
+}
+
+function forEach<T>(
+  children: React.ReactNode,
+  func: (el: React.ReactElement<T>, index: number) => void
+) {
+  let index = 0;
+
+  React.Children.forEach(children, (child) => {
+    if (React.isValidElement<T>(child)) func(child, index++);
+  });
 }

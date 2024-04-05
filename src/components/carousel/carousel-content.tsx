@@ -9,7 +9,7 @@ type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {
 export function CarouselContent({ className, ...props }: CarouselContentProps) {
   const { reference: ref } = props;
 
-  const { page, dimension, isTransitioning, slide, dragDistance, isDragging } =
+  const { page, dimension, slide, dragDistance, isDragging } =
     useCarouselContext();
 
   const {
