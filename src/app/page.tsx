@@ -5,6 +5,7 @@ import Button from "@/components/button/button";
 import { CarouselExample1 } from "@/components/carousel/stories/carousel-example1";
 import CarouselExample2 from "@/components/carousel/stories/carousel-example2";
 import { Example1 } from "@/components/dialog/dialog";
+import { DropdownExample } from "@/components/dropdown/dropdown";
 
 export default function Home() {
   return (
@@ -33,6 +34,9 @@ export default function Home() {
       {/* Carousel */}
       <CarouselExample1 />
       <CarouselExample2 />
+
+      {/* Dropdown */}
+      <DropdownExample />
     </main>
   );
 }
