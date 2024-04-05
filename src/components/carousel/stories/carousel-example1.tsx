@@ -46,4 +46,3 @@ export function CarouselExample1() {
     </Carousel>
   );
 }
-export { Carousel };
