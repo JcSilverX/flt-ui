@@ -33,7 +33,7 @@ export default function Home() {
       {/* <Example4 /> */}
 
       {/* Dropdown */}
-      <header className="h-[500px] flex justify-end items-center">
+      <header className="h-[500px] flex justify-center items-">
         <nav>
           <ul>
             <li>

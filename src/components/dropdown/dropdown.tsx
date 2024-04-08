@@ -11,17 +11,23 @@ import usePositioningEngine from "@/lib/hooks/use-positioning-engine";
 
 type DropdownProps = React.HTMLAttributes<HTMLDivElement> & {
   reference?: React.RefObject<HTMLDivElement>;
-  direction?: "up-start" | "down-start" | "up-end" | "down-end";
-  // | "end"
-  // | "start"
-  // | "up-centered"
-  // | "down-centered"
-  // | "start-centered"
-  // | "end-centered";
+  direction?:
+    | "up-start"
+    | "down-start"
+    | "up-end"
+    | "down-end"
+    | "start-down"
+    | "start-up"
+    | "end-down"
+    | "end-up"
+    | "up-centered"
+    | "down-centered"
+    | "start-centered"
+    | "end-centered";
 };
 
 export default function Dropdown({
-  direction = "down-start",
+  direction = "up-start",
   className,
   ...props
 }: DropdownProps) {

@@ -61,8 +61,271 @@ export default function usePositioningEngine(
             left: referenceRect.right - positionedElementRect.width,
           };
           break;
+
+        case "start-down":
+          // 'logic for `start-down`'
+          newPosition = {
+            top: referenceRect.top,
+            left: referenceRect.left - positionedElementRect.width,
+          };
+          break;
+        case "start-up":
+          // 'logic for `start-up`'
+          newPosition = {
+            top: referenceRect.bottom - positionedElementRect.height,
+            left: referenceRect.left - positionedElementRect.width,
+          };
+          break;
+        case "end-down":
+          // 'logic for `end-down`'
+          newPosition = {
+            top: referenceRect.top,
+            left: referenceRect.right,
+          };
+          break;
+        case "end-up":
+          // 'logic for `end-up`'
+          newPosition = {
+            top: referenceRect.bottom - positionedElementRect.height,
+            left: referenceRect.right,
+          };
+          break;
+
+        case "up-centered":
+          // 'logic for `up-centered`'
+          newPosition = {
+            top: referenceRect.top - positionedElementRect.height,
+            left:
+              referenceRect.left +
+              (referenceRect.width - positionedElementRect.width) / 2,
+          };
+          break;
+        case "down-centered":
+          // 'logic for `down-centered`'
+          newPosition = {
+            top: referenceRect.bottom,
+            left:
+              referenceRect.left +
+              (referenceRect.width - positionedElementRect.width) / 2,
+          };
+          break;
+        case "start-centered":
+          // 'logic for `start-centered`'
+          newPosition = {
+            top:
+              referenceRect.top +
+              (referenceRect.height - positionedElementRect.height) / 2,
+            left: referenceRect.left - positionedElementRect.width,
+          };
+          break;
+        case "end-centered":
+          // 'logic for `end-centered`'
+          newPosition = {
+            top:
+              referenceRect.top +
+              (referenceRect.height - positionedElementRect.height) / 2,
+            left: referenceRect.right,
+          };
+
+          break;
       }
 
+      return newPosition;
+    };
+
+    const handleUpDown = (
+      referenceRect: DOMRect,
+      positionedElementRect: DOMRect,
+      newPosition: TPosition
+    ): TPosition => {
+      if (newPosition.left + referenceRect.width > window.innerWidth - 4) {
+        console.log("not enough space at the end");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "down-end" ? "down-end" : "up-end"
+        );
+
+        if (
+          newPosition.top + positionedElementRect.height >
+            window.innerHeight - 4 &&
+          !(referenceRect.top < 4)
+        ) {
+          console.log("not enough space at the bottom");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "up-end"
+          );
+        }
+
+        if (referenceRect.top < 4) {
+          console.log("not enough space at the top");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "down-end"
+          );
+        }
+      } else if (referenceRect.left < 4) {
+        console.log("not enough space at the start");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "down-start" ? "down-start" : "up-start"
+        );
+
+        if (
+          newPosition.top + positionedElementRect.height >
+            window.innerHeight - 4 &&
+          !(referenceRect.top < 4)
+        ) {
+          console.log("not enough space at the bottom");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "up-start"
+          );
+        }
+
+        if (referenceRect.top < 4) {
+          console.log("not enough space at the top");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "down-start"
+          );
+        }
+      } else if (
+        newPosition.top + positionedElementRect.height >
+          window.innerHeight - 4 &&
+        !(referenceRect.top < 4)
+      ) {
+        console.log("not enough space at the bottom");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "down-start" ? "up-start" : "up-end"
+        );
+      } else if (referenceRect.top < 4) {
+        console.log("not enough space at the top");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "down-start" ? "down-start" : "down-end"
+        );
+      }
+
+      return newPosition;
+    };
+
+    const handleStartEnd = (
+      referenceRect: DOMRect,
+      positionedElementRect: DOMRect,
+      newPosition: TPosition
+    ): TPosition => {
+      if (newPosition.left + referenceRect.width > window.innerWidth - 4) {
+        console.log("not enough space at the end");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "down-end" ? "down-end" : "start-down"
+        );
+
+        if (
+          newPosition.top + positionedElementRect.height >
+            window.innerHeight - 4 &&
+          !(referenceRect.top < 4)
+        ) {
+          console.log("not enough space at the bottom");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "start-up"
+          );
+        }
+
+        if (referenceRect.top < 4) {
+          console.log("not enough space at the top");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "start-down"
+          );
+        }
+      } else if (referenceRect.left < 4) {
+        console.log("not enough space at the start");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "start-down" ? "end-down" : "end-up"
+        );
+
+        if (
+          newPosition.top + positionedElementRect.height >
+            window.innerHeight - 4 &&
+          !(referenceRect.top < 4)
+        ) {
+          console.log("not enough space at the bottom");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "end-up"
+          );
+        }
+
+        if (referenceRect.top < 4) {
+          console.log("not enough space at the top");
+
+          newPosition = calculatePosition(
+            referenceRect,
+            positionedElementRect,
+            "end-down"
+          );
+        }
+      } else if (
+        newPosition.top + positionedElementRect.height >
+          window.innerHeight - 4 &&
+        !(referenceRect.top < 4)
+      ) {
+        console.log("not enough space at the bottom");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "start-down" ? "start-up" : "end-up"
+        );
+      } else if (referenceRect.top < 4) {
+        console.log("not enough space at the top");
+
+        newPosition = calculatePosition(
+          referenceRect,
+          positionedElementRect,
+          direction === "start-down" ? "start-down" : "end-down"
+        );
+      }
+
+      return newPosition;
+    };
+
+    const handleCentered = (
+      referenceRect: DOMRect,
+      positionedElementRect: DOMRect,
+      newPosition: TPosition
+    ): TPosition => {
       return newPosition;
     };
 
@@ -77,52 +340,38 @@ export default function usePositioningEngine(
       );
 
       if (
-        newPosition.top + positionedElementRect.height >
-        window.innerHeight - 4
+        direction === "down-start" ||
+        direction === "down-end" ||
+        direction === "up-start" ||
+        direction === "up-end"
       ) {
-        console.log("not enough space at the bottom");
-
-        if (direction === "down-start") {
-          newPosition = calculatePosition(
-            referenceRect,
-            positionedElementRect,
-            "up-start"
-          );
-        }
-      } else if (newPosition.top < 4) {
-        // TODO
-        console.log("not enough space at the top");
-
-        if (direction === "down-start") {
-          newPosition = calculatePosition(
-            referenceRect,
-            positionedElementRect,
-            "down-start"
-          );
-        }
+        newPosition = handleUpDown(
+          referenceRect,
+          positionedElementRect,
+          newPosition
+        );
       } else if (
-        newPosition.left + referenceRect.width >
-        window.innerWidth - 4
+        direction === "start-down" ||
+        direction === "start-up" ||
+        direction === "end-down" ||
+        direction === "end-up"
       ) {
-        console.log("not enough space at the end");
-
-        if (direction === "down-start") {
-          newPosition = calculatePosition(
-            referenceRect,
-            positionedElementRect,
-            "down-end"
-          );
-        }
-      } else if (referenceRect.left < 4) {
-        console.log("not enough space at the start");
-
-        if (direction === "down-start") {
-          newPosition = calculatePosition(
-            referenceRect,
-            positionedElementRect,
-            "down-start"
-          );
-        }
+        newPosition = handleStartEnd(
+          referenceRect,
+          positionedElementRect,
+          newPosition
+        );
+      } else if (
+        direction === "up-centered" ||
+        direction === "down-centered" ||
+        direction === "start-centered" ||
+        direction === "end-centered"
+      ) {
+        newPosition = handleCentered(
+          referenceRect,
+          positionedElementRect,
+          newPosition
+        );
       }
 
       setPosition(newPosition);
