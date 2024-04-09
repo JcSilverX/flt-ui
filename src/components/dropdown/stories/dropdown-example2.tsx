@@ -8,7 +8,7 @@ import Dropdown, {
 export default function DropdownExample2() {
   return (
     <Dropdown>
-      <DropdownTrigger>Open Dropdown</DropdownTrigger>
+      <DropdownTrigger>Open Dropdown 2</DropdownTrigger>
 
       <DropdownMenu>
         <DropdownMenuLabel>My Profile</DropdownMenuLabel>

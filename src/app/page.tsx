@@ -7,6 +7,13 @@ import CarouselExample2 from "@/components/carousel/stories/carousel-example2";
 import { Example1 } from "@/components/dialog/dialog";
 import DropdownExample1 from "@/components/dropdown/stories/dropdown-example1";
 import DropdownExample2 from "@/components/dropdown/stories/dropdown-example2";
+import DropdownExample3 from "@/components/dropdown/stories/dropdown-example3";
+import DropdownExample4 from "@/components/dropdown/stories/dropdown-example4";
+import DropdownExample5 from "@/components/dropdown/stories/dropdown-example5";
+import DropdownExample6 from "@/components/dropdown/stories/dropdown-example6";
+import DropdownExample7 from "@/components/dropdown/stories/dropdown-example7";
+import DropdownExample8 from "@/components/dropdown/stories/dropdown-example8";
+import DropdownExample9 from "@/components/dropdown/stories/dropdown-example9";
 
 export default function Home() {
   return (
@@ -33,19 +40,41 @@ export default function Home() {
       {/* <Example4 /> */}
 
       {/* Dropdown */}
-      <header className="h-[500px] flex justify-center items-">
-        <nav>
-          <ul>
-            <li>
-              <DropdownExample1 />
-            </li>
-          </ul>
-        </nav>
-      </header>
-      {/* <div className="grid grid-flow-col-dense h-full justify-between">
-
-      </div> */}
-
+      <div className="h-dvh flex justify-between">
+        <div className="h-full flex flex-col justify-between">
+          <div>
+            <DropdownExample1 />
+          </div>
+          <div>
+            <DropdownExample2 />
+          </div>
+          <div>
+            <DropdownExample3 />
+          </div>
+        </div>
+        <div className="h-full flex flex-col justify-between">
+          <div>
+            <DropdownExample4 />
+          </div>
+          <div>
+            <DropdownExample5 />
+          </div>
+          <div>
+            <DropdownExample6 />
+          </div>
+        </div>
+        <div className="h-full flex flex-col justify-between">
+          <div>
+            <DropdownExample7 />
+          </div>
+          <div>
+            <DropdownExample8 />
+          </div>
+          <div>
+            <DropdownExample9 />
+          </div>
+        </div>
+      </div>
       {/* Carousel */}
       {/* <CarouselExample1 />
       <CarouselExample2 /> */}

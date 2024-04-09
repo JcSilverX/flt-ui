@@ -5,10 +5,10 @@ import Dropdown, {
   DropdownMenuItem,
 } from "../dropdown";
 
-export default function DropdownExample3() {
+export default function DropdownExample9() {
   return (
     <Dropdown>
-      <DropdownTrigger>Open Dropdown 3</DropdownTrigger>
+      <DropdownTrigger>Open Dropdown 9</DropdownTrigger>
 
       <DropdownMenu>
         <DropdownMenuLabel>My Profile</DropdownMenuLabel>

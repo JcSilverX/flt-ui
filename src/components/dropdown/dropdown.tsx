@@ -27,7 +27,7 @@ type DropdownProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 export default function Dropdown({
-  direction = "up-start",
+  direction = "down-start",
   className,
   ...props
 }: DropdownProps) {
