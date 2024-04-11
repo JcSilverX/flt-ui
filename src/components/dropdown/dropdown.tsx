@@ -9,25 +9,27 @@ import useIsMounted from "@/lib/hooks/use-is-mounted";
 import useDropdownContext from "@/lib/hooks/use-dopdown-context";
 import usePositioningEngine from "@/lib/hooks/use-positioning-engine";
 
+export type TPlacement =
+  | "top"
+  | "top-start"
+  | "top-end"
+  | "right"
+  | "right-start"
+  | "right-end"
+  | "bottom"
+  | "bottom-start"
+  | "bottom-end"
+  | "left"
+  | "left-start"
+  | "left-end";
+
 type DropdownProps = React.HTMLAttributes<HTMLDivElement> & {
   reference?: React.RefObject<HTMLDivElement>;
-  direction?:
-    | "up-start"
-    | "down-start"
-    | "up-end"
-    | "down-end"
-    | "start-down"
-    | "start-up"
-    | "end-down"
-    | "end-up"
-    | "up-centered"
-    | "down-centered"
-    | "start-centered"
-    | "end-centered";
+  placement?: TPlacement;
 };
 
 export default function Dropdown({
-  direction = "down-start",
+  placement = "bottom-start",
   className,
   ...props
 }: DropdownProps) {
@@ -36,27 +38,18 @@ export default function Dropdown({
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const dropdownTriggerRef = React.useRef<HTMLButtonElement>(null);
   const dropdownMenuRef = React.useRef<HTMLDivElement>(null);
-  const position = usePositioningEngine(
+  const { x, y } = usePositioningEngine(
     isOpen,
+    setIsOpen,
     dropdownTriggerRef,
     dropdownMenuRef,
-    direction
+    placement
   );
 
   // derived state
 
   // event handlers / actions
   const handleClick = (): void => setIsOpen((prev) => !prev);
-
-  // useEffect
-
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-  }, [isOpen]);
 
   return (
     <DropdownContext.Provider
@@ -65,7 +58,8 @@ export default function Dropdown({
         isOpen,
         dropdownTriggerRef,
         dropdownMenuRef,
-        position,
+        x,
+        y,
         handleClick,
       }}
     >
@@ -102,7 +96,8 @@ export function DropdownMenu({ className, ...props }: DropdownMenuProps) {
   const {
     isMounted,
     dropdownMenuRef: ref,
-    position,
+    x,
+    y,
     isOpen,
   } = useDropdownContext();
 
@@ -116,7 +111,9 @@ export function DropdownMenu({ className, ...props }: DropdownMenuProps) {
             "fixed flex top-0 left-0 flex-col max-w-fit min-w-32 py-2 bg-gray-50 z-[1000] border shadow rounded-xl",
             className
           )}
-          style={{ top: position.top, left: position.left }}
+          style={{
+            transform: `translate(${x}px, ${y}px)`,
+          }}
           {...props}
         />
       ),
@@ -151,143 +148,3 @@ export function DropdownMenuItem({
 }: DropdownMenuItemProps) {
   return <div className={cn("px-3 py-1.5 text-sm", className)} {...props} />;
 }
-
-// export function usePositioningEngine(
-//   isOpen: boolean,
-//   referenceRef: React.RefObject<HTMLElement>,
-//   positionedElementRef: React.RefObject<HTMLElement>
-// ) {
-//   const [position, setPosition] = React.useState({ top: 0, left: 0 });
-
-//   React.useEffect(() => {
-//     const updatePosition = (): void => {
-//       if (isOpen && referenceRef.current && positionedElementRef.current) {
-//         const dropdownTriggerRect =
-//           referenceRef.current.getBoundingClientRect();
-//         const dropdownMenuRect =
-//           positionedElementRef.current.getBoundingClientRect();
-
-//         const newPosition = {
-//           top: dropdownTriggerRect.bottom,
-//           left: dropdownTriggerRect.left,
-//         };
-
-//         const dropdownMenuHeight = dropdownMenuRect.height;
-
-//         if (newPosition.top + dropdownMenuHeight > window.innerHeight) {
-//           if (dropdownMenuHeight > dropdownTriggerRect.top) {
-//             newPosition.top = window.scrollY;
-//           } else {
-//             newPosition.top = dropdownTriggerRect.top - dropdownMenuHeight;
-//           }
-//         }
-
-//         if (newPosition.left + dropdownMenuRect.width > window.innerWidth) {
-//           newPosition.left = window.innerWidth - dropdownMenuRect.width;
-//         }
-
-//         setPosition(newPosition);
-//       }
-//     };
-
-//     updatePosition();
-//     window.addEventListener("resize", updatePosition);
-
-//     return () => {
-//       window.removeEventListener("resize", updatePosition);
-//     };
-//   }, [positionedElementRef, referenceRef, isOpen]);
-
-//   return position;
-// }
-
-// export function usePositioningEngine(
-//   isOpen: boolean,
-//   referenceRef: React.RefObject<HTMLElement>,
-//   positionedElementRef: React.RefObject<HTMLElement>
-// ) {
-//   const [position, setPosition] = React.useState({ top: 0, left: 0 });
-
-//   React.useEffect(() => {
-//     const updatePosition = (): void => {
-//       if (isOpen && referenceRef.current && positionedElementRef.current) {
-//         const referenceRect = referenceRef.current.getBoundingClientRect();
-//         const positionedElementRect =
-//           positionedElementRef.current.getBoundingClientRect();
-
-//         // logic for 'up'
-//         // let newPosition = {
-//         //   top: referenceRect.top - positionedElementRect.height,
-//         //   left: referenceRect.left,
-//         // };
-
-//         // logic for 'down'
-//         // let newPosition = {
-//         //   top: referenceRect.bottom,
-//         //   left: referenceRect.left,
-//         // };
-
-//         // logic for 'end'
-//         // let newPosition = {
-//         //   top: referenceRect.top,
-//         //   left: referenceRect.right,
-//         // };
-
-//         // logic for 'start'
-//         // let newPosition = {
-//         //   top: referenceRect.top,
-//         //   left: referenceRect.left - positionedElementRect.width,
-//         // };
-
-//         // logic for 'up-centered'
-//         // let newPosition = {
-//         //   top: referenceRect.top - positionedElementRect.height,
-//         //   left:
-//         //     referenceRect.left +
-//         //     (referenceRect.width - positionedElementRect.width) / 2,
-//         // };
-
-//         // logic for 'down-centered'
-//         // let newPosition = {
-//         //   top: referenceRect.bottom,
-//         //   left:
-//         //     referenceRect.left +
-//         //     (referenceRect.width - positionedElementRect.width) / 2,
-//         // };
-
-//         // logic for 'start-centered'
-//         // let newPosition = {
-//         //   top:
-//         //     referenceRect.top +
-//         //     (referenceRect.height - positionedElementRect.height) / 2,
-//         //   left: referenceRect.left - positionedElementRect.width,
-//         // };
-
-//         // logic for 'end-centered'
-//         // let newPosition = {
-//         //   top:
-//         //     referenceRect.top +
-//         //     (referenceRect.height - positionedElementRect.height) / 2,
-//         //   left: referenceRect.right,
-//         // };
-
-//         // logic for 'down-end'
-//         // let newPosition = {
-//         //   top: referenceRect.bottom,
-//         //   left: referenceRect.right - positionedElementRect.width,
-//         // };
-
-//         setPosition(newPosition);
-//       }
-//     };
-
-//     updatePosition();
-//     window.addEventListener("resize", updatePosition);
-
-//     return () => {
-//       window.removeEventListener("resize", updatePosition);
-//     };
-//   }, [positionedElementRef, referenceRef, isOpen]);
-
-//   return position;
-// }

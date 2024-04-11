@@ -17,67 +17,34 @@ import DropdownExample9 from "@/components/dropdown/stories/dropdown-example9";
 
 export default function Home() {
   return (
-    <main className="grid gap-4">
+    <main className="h-dvh grid gap-4">
       {/* buttons */}
-      {/* <Button size={"sm"}>Default</Button>
+      <Button size={"sm"}>Default</Button>
       <Button variant={"destructive"}>Destructive</Button>
       <Button variant={"outline"}>outline</Button>
       <Button variant={"primary"}>Primary</Button>
       <Button variant={"secondary"}>Secondary</Button>
       <Button variant={"ghost"}>Ghost</Button>
-      <Button variant={"link"}>Link</Button> */}
+      <Button variant={"link"}>Link</Button>
 
       {/* dialog */}
-      {/* <Example1 /> */}
+      <Example1 />
 
       {/* Alert */}
-      {/* <AlertExample1 /> */}
+      <AlertExample1 />
 
       {/* Alert Dialog */}
-      {/* <AlertDialogExample /> */}
+      <AlertDialogExample />
 
       {/* Avatar */}
-      {/* <Example4 /> */}
+      <Example4 />
+
+      {/* Carousel */}
+      <CarouselExample1 />
+      <CarouselExample2 />
 
       {/* Dropdown */}
-      <div className="h-dvh flex justify-between">
-        <div className="h-full flex flex-col justify-between">
-          <div>
-            <DropdownExample1 />
-          </div>
-          <div>
-            <DropdownExample2 />
-          </div>
-          <div>
-            <DropdownExample3 />
-          </div>
-        </div>
-        <div className="h-full flex flex-col justify-between">
-          <div>
-            <DropdownExample4 />
-          </div>
-          <div>
-            <DropdownExample5 />
-          </div>
-          <div>
-            <DropdownExample6 />
-          </div>
-        </div>
-        <div className="h-full flex flex-col justify-between">
-          <div>
-            <DropdownExample7 />
-          </div>
-          <div>
-            <DropdownExample8 />
-          </div>
-          <div>
-            <DropdownExample9 />
-          </div>
-        </div>
-      </div>
-      {/* Carousel */}
-      {/* <CarouselExample1 />
-      <CarouselExample2 /> */}
+      <DropdownExample1 />
     </main>
   );
 }

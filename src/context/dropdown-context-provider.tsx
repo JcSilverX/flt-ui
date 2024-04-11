@@ -7,10 +7,8 @@ type TDropdownContext = {
   isOpen: boolean;
   dropdownTriggerRef: React.RefObject<HTMLButtonElement>;
   dropdownMenuRef: React.RefObject<HTMLDivElement>;
-  position: {
-    top: number;
-    left: number;
-  };
+  x: number;
+  y: number;
   handleClick: () => void;
 };
 
