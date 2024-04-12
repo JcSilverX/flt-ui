@@ -1,5 +1,22 @@
 import React from "react";
 import cn from "@/lib/utils/cn";
+import { VariantProps, cva } from "class-variance-authority";
+
+const SpinnerVariants = cva(
+  "inline-block border-black border-r-[transparent] rounded-full animate-spin",
+  {
+    variants: {
+      size: {
+        sm: "h-8 w-8 border-[.25em]",
+        md: "h-16 w-16 border-[.35em]",
+        lg: "h-32 w-32 border-[.50em]",
+      },
+    },
+    defaultVariants: {
+      size: "sm",
+    },
+  }
+);
 
 export function SpinnerExample() {
   return (
@@ -11,10 +28,11 @@ export function SpinnerExample() {
   );
 }
 
-type SpinnerProps = React.HTMLAttributes<HTMLSpanElement> & {
-  reference?: React.RefObject<HTMLSpanElement>;
-  size?: "sm" | "md" | "lg";
-};
+type SpinnerProps = React.HTMLAttributes<HTMLSpanElement> &
+  VariantProps<typeof SpinnerVariants> & {
+    reference?: React.RefObject<HTMLSpanElement>;
+    size?: "sm" | "md" | "lg";
+  };
 
 export default function Spinner({
   size = "sm",
@@ -27,15 +45,7 @@ export default function Spinner({
     <span
       ref={ref}
       role="status"
-      className={cn(
-        "inline-block border-black border-r-[transparent] rounded-full animate-spin",
-        className,
-        {
-          "h-8 w-8 border-[.25em]": size === "sm",
-          "h-16 w-16 border-[.35em]": size === "md",
-          "h-32 w-32 border-[.50em]": size === "lg",
-        }
-      )}
+      className={cn(SpinnerVariants({ size, className }))}
       {...props}
     >
       <span className="invisible">Loading...</span>
