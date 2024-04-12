@@ -28,10 +28,10 @@ export default function Spinner({
       ref={ref}
       role="status"
       className={cn(
-        "inline-block border-[.25em] border-black border-r-[transparent] rounded-full animate-spin",
+        "inline-block border-black border-r-[transparent] rounded-full animate-spin",
         className,
         {
-          "h-8 w-8": size === "sm",
+          "h-8 w-8 border-[.25em]": size === "sm",
           "h-16 w-16 border-[.35em]": size === "md",
           "h-32 w-32 border-[.50em]": size === "lg",
         }
