@@ -14,6 +14,7 @@ import DropdownExample6 from "@/components/dropdown/stories/dropdown-example6";
 import DropdownExample7 from "@/components/dropdown/stories/dropdown-example7";
 import DropdownExample8 from "@/components/dropdown/stories/dropdown-example8";
 import DropdownExample9 from "@/components/dropdown/stories/dropdown-example9";
+import { SpinnerExample } from "@/components/spinner/spinner";
 
 export default function Home() {
   return (
@@ -45,6 +46,11 @@ export default function Home() {
 
       {/* Dropdown */}
       <DropdownExample1 />
+
+      {/* Spinner */}
+      <div className="flex justify-center">
+        <SpinnerExample />
+      </div>
     </main>
   );
 }
