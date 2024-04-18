@@ -1,3 +1,4 @@
+import { ExampleAccordion } from "@/components/accordion/accordion";
 import AlertDialogExample from "@/components/alert-dialog/alert-dialog";
 import { AlertExample1 } from "@/components/alert/alert";
 import { Example4 } from "@/components/avatar/avatar";
@@ -51,6 +52,9 @@ export default function Home() {
       <div className="flex justify-center">
         <SpinnerExample />
       </div>
+
+      {/* Accordion */}
+      <ExampleAccordion />
     </main>
   );
 }
