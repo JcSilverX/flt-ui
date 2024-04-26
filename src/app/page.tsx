@@ -9,6 +9,7 @@ import { CardExample } from "@/components/card/card";
 import { CarouselExample1 } from "@/components/carousel/stories/carousel-example1";
 import CarouselExample2 from "@/components/carousel/stories/carousel-example2";
 import { CheckboxExample } from "@/components/checkbox/checkbox";
+import { CollapsibleExample } from "@/components/collapsible/collapsible";
 import { Example1 } from "@/components/dialog/dialog";
 import DropdownExample1 from "@/components/dropdown/stories/dropdown-example1";
 import DropdownExample2 from "@/components/dropdown/stories/dropdown-example2";
@@ -71,6 +72,9 @@ export default function Home() {
 
       {/* Checbox */}
       <CheckboxExample />
+
+      {/* Collapsible */}
+      <CollapsibleExample />
     </main>
   );
 }
