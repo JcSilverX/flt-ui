@@ -5,6 +5,7 @@ import { Example4 } from "@/components/avatar/avatar";
 import BadgeExample1 from "@/components/badge/stories/badge-example1";
 import { BreadcrumbExample1 } from "@/components/breadcrumb/breadcrumb";
 import Button from "@/components/button/button";
+import { CardExample } from "@/components/card/card";
 import { CarouselExample1 } from "@/components/carousel/stories/carousel-example1";
 import CarouselExample2 from "@/components/carousel/stories/carousel-example2";
 import { Example1 } from "@/components/dialog/dialog";
@@ -63,6 +64,9 @@ export default function Home() {
 
       {/* Breadcrumb */}
       <BreadcrumbExample1 />
+
+      {/* Card */}
+      <CardExample />
     </main>
   );
 }
