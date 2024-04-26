@@ -13,6 +13,7 @@
 - Carousel ✔
 - Checkbox ✔
 - Collapsible ✔
+- Combobox ✔
 - Command
 - Context Menu
 - Data Table
