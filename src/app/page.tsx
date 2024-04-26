@@ -3,6 +3,7 @@ import AlertDialogExample from "@/components/alert-dialog/alert-dialog";
 import { AlertExample1 } from "@/components/alert/alert";
 import { Example4 } from "@/components/avatar/avatar";
 import BadgeExample1 from "@/components/badge/stories/badge-example1";
+import { BreadcrumbExample1 } from "@/components/breadcrumb/breadcrumb";
 import Button from "@/components/button/button";
 import { CarouselExample1 } from "@/components/carousel/stories/carousel-example1";
 import CarouselExample2 from "@/components/carousel/stories/carousel-example2";
@@ -59,6 +60,9 @@ export default function Home() {
 
       {/* Badge */}
       <BadgeExample1 />
+
+      {/* Breadcrumb */}
+      <BreadcrumbExample1 />
     </main>
   );
 }
