@@ -36,7 +36,7 @@ export default function ToggleGroup({
 
   // event handlers / actions
   const handleClick = (value: string): void => {
-    if (type === 'single') {
+    if (type === "single") {
       setPressedItems((prev) => {
         if (prev.includes(value)) {
           return [];
@@ -51,7 +51,7 @@ export default function ToggleGroup({
         } else {
           return [...prev, value];
         }
-      })
+      });
     }
   };
 
@@ -61,7 +61,11 @@ export default function ToggleGroup({
         ref={ref}
         role="group"
         tabIndex={0}
-        className={cn("flex items-center justify-center gap-1 outline-none", className, {})}
+        className={cn(
+          "flex items-center justify-center gap-1 outline-none",
+          className,
+          {}
+        )}
         {...props}
       />
     </ToggleGroupProvider>
@@ -79,8 +83,10 @@ export function ToggleGroupItem({
   const { reference: ref } = props;
   const { pressedItems, handleClick } = useToggleGroupContext();
 
-  const handleClickWrapper = () => typeof value === "string" && handleClick(value);
-  const isPressed: boolean = typeof value === 'string' && pressedItems.includes(value);
+  const handleClickWrapper = () =>
+    typeof value === "string" && handleClick(value);
+  const isPressed: boolean =
+    typeof value === "string" && pressedItems.includes(value);
 
   return (
     <Button
@@ -91,7 +97,7 @@ export function ToggleGroupItem({
       aria-pressed={isPressed}
       variant={variant}
       className={cn("", className, {
-        'bg-gray-100': isPressed
+        "bg-gray-100": isPressed,
       })}
       {...props}
     />
