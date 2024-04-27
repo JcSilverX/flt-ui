@@ -11,29 +11,57 @@ const ToggleGroupProvider = ToggleGroupContext.Provider;
 type ToggleGroupProps = React.HTMLAttributes<HTMLDivElement> & {
   reference?: React.RefObject<HTMLDivElement>;
   type?: "single" | "multiple";
+  defaultValue?: string | string[];
 };
 
 export default function ToggleGroup({
   type = "single",
+  defaultValue,
   className,
   ...props
 }: ToggleGroupProps) {
   const { reference: ref } = props;
 
   // state
-  const [isPressed, setIsPressed] = React.useState<boolean>(Boolean);
+  const [pressedItems, setPressedItems] = React.useState<string[]>(() => {
+    if (type === "multiple" && Array.isArray(defaultValue)) {
+      return defaultValue;
+    } else if (type === "single" && typeof defaultValue === "string") {
+      return [defaultValue];
+    }
 
+    return [];
+  });
   // derived state
 
   // event handlers / actions
-  const handleClick = (evt: React.MouseEvent<HTMLButtonElement>): void =>
-    setIsPressed((prev) => !prev);
+  const handleClick = (value: string): void => {
+    if (type === 'single') {
+      setPressedItems((prev) => {
+        if (prev.includes(value)) {
+          return [];
+        } else {
+          return [value];
+        }
+      });
+    } else {
+      setPressedItems((prev) => {
+        if (prev.includes(value)) {
+          return prev.filter((item) => item !== value);
+        } else {
+          return [...prev, value];
+        }
+      })
+    }
+  };
 
   return (
-    <ToggleGroupProvider value={{ isPressed, handleClick }}>
+    <ToggleGroupProvider value={{ pressedItems, handleClick }}>
       <div
         ref={ref}
-        className={cn("flex items-center justify-center gap-1", className, {})}
+        role="group"
+        tabIndex={0}
+        className={cn("flex items-center justify-center gap-1 outline-none", className, {})}
         {...props}
       />
     </ToggleGroupProvider>
@@ -49,17 +77,22 @@ export function ToggleGroupItem({
   ...props
 }: ToggleGroupItemProps) {
   const { reference: ref } = props;
-  const { isPressed, handleClick } = useToggleGroupContext();
+  const { pressedItems, handleClick } = useToggleGroupContext();
+
+  const handleClickWrapper = () => typeof value === "string" && handleClick(value);
+  const isPressed: boolean = typeof value === 'string' && pressedItems.includes(value);
 
   return (
     <Button
       reference={ref}
       type="button"
       tabIndex={isPressed ? 0 : -1}
-      onClick={handleClick}
+      onClick={handleClickWrapper}
       aria-pressed={isPressed}
       variant={variant}
-      className={cn("", className, {})}
+      className={cn("", className, {
+        'bg-gray-100': isPressed
+      })}
       {...props}
     />
   );

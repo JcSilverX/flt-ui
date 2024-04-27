@@ -3,8 +3,8 @@
 import { createContext } from "react";
 
 type TToggleGroupContext = {
-  isPressed: boolean;
-  handleClick: (evt: React.MouseEvent<HTMLButtonElement>) => void;
+  pressedItems: string[];
+  handleClick: (value: string) => void;
 };
 
 const ToggleGroupContext = createContext<TToggleGroupContext | null>(null);
