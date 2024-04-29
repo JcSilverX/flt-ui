@@ -44,7 +44,7 @@
 - Table
 - Tabs
 - Textarea
-- Toast
-- Toggle
-- Toggle Group
-- Tooltip
+- Toast ✔
+- Toggle ✔
+- Toggle Group ✔
+- Tooltip ✔
