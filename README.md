@@ -43,7 +43,7 @@
 - Switch
 - Table
 - Tabs
-- Textarea
+- Textarea ✔
 - Toast ✔
 - Toggle ✔
 - Toggle Group ✔
