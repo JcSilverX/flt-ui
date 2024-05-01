@@ -1,15 +1,12 @@
 "use client";
 
+import SwitchExample from "@/components/switch/stories/switch-example";
 import React from "react";
 
-import Tabs, {
-  TabsTrigger,
-  TabsContent,
-  TabsList,
-} from "@/components/tabs/tabs";
-
 export default function Home() {
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
-
-  return <main className="h-dvh grid gap-4 place-items-center"></main>;
+  return (
+    <main className="h-dvh grid gap-4 place-items-center">
+      <SwitchExample />
+    </main>
+  );
 }

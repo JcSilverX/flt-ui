@@ -39,10 +39,10 @@
 - Sheet
 - Skeleton
 - Slider
-- Sonner
-- Switch
-- Table
-- Tabs
+- Sonner ✔
+- Switch ✔
+- Table ✔
+- Tabs ✔
 - Textarea ✔
 - Toast ✔
 - Toggle ✔
