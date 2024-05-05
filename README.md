@@ -35,10 +35,10 @@
 - Resizable
 - Scroll Area
 - Select
-- Separator
+- Separator ✔
 - Sheet
 - Skeleton
-- Slider
+- Slider ✔
 - Sonner ✔
 - Switch ✔
 - Table ✔
