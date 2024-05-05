@@ -26,7 +26,7 @@ export default function Switch({
   ...props
 }: SwitchProps) {
   // state
-  const [isChecked, setIsChecked] = useControllableState({
+  const [isChecked = false, setIsChecked] = useControllableState({
     prop: checked,
     defaultProp: defaultChecked as boolean,
     onChange: onCheckedChange as React.Dispatch<React.SetStateAction<boolean>>,
