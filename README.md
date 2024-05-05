@@ -37,7 +37,7 @@
 - Select
 - Separator ✔
 - Sheet
-- Skeleton
+- Skeleton ✔
 - Slider ✔
 - Sonner ✔
 - Switch ✔
