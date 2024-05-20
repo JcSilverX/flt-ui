@@ -1,9 +1,13 @@
 import ScrollAreaContext from "@/context/scroll-area-context-provider";
+import useIsMounted from "@/lib/hooks/use-is-mounted";
 import useScrollAreaContext from "@/lib/hooks/use-scroll-area-context";
 import cn from "@/lib/utils/cn";
 import React from "react";
 
 const ScrollAreaProvider = ScrollAreaContext.Provider;
+const EVT_POINTER_ENTER = "pointerenter";
+const EVT_POINTER_LEAVE = "pointerleave";
+const EVT_SCROLL = "scroll";
 
 export type TTimeout = NodeJS.Timeout | number;
 export type TDirection = "ltr" | "rtl";
@@ -42,31 +46,93 @@ export default function ScrollArea({
 	const { children, reference: ref } = props;
 
 	// state
+	const isMounted = useIsMounted();
 	const [isVisible, setIsVisible] = React.useState<boolean>(false);
-
-	let timeoutId: TTimeout = 0;
+	const [scrollbarX, setScrollbarX] = React.useState<number | null>(null);
+	const [scrollbarY, setScrollbarY] = React.useState<number | null>(null);
+	const [cornerWidth, setCornerWidth] = React.useState<number>(0);
+	const [cornerHeight, setCornerHeight] = React.useState<number>(0);
+	const scrollAreaViewportRef = React.useRef<HTMLDivElement>(null);
+	const scrollAreaScrollbarRef = React.useRef<HTMLDivElement>(null);
 
 	// derived state
 
 	// event handlers / action
-	const handleShow = (): void => {
-		clearTimeout(timeoutId);
-		setIsVisible(true);
-	};
-	const handleHide = () => {
-		timeoutId = setTimeout(() => setIsVisible(false), scrollHideDelay);
-	};
-
-	const handlePointerEnter = (): void => handleShow();
-	const handlePointerLeave = (): void => handleHide();
 
 	// useEffect
+	React.useEffect(() => {
+		const scrollAreaViewport = scrollAreaViewportRef.current;
+		let timeoutId = 0;
+
+		if (!scrollAreaViewport) return;
+
+		const handleShow = (): void => {
+			window.clearTimeout(timeoutId);
+			setIsVisible(true);
+		};
+		const handleHide = () => {
+			timeoutId = window.setTimeout(() => setIsVisible(false), scrollHideDelay);
+		};
+
+		const handlePointerEnter = (): void => handleShow();
+		const handlePointerLeave = (): void => handleHide();
+
+		scrollAreaViewport.addEventListener(EVT_POINTER_ENTER, handlePointerEnter);
+		scrollAreaViewport.addEventListener(EVT_POINTER_LEAVE, handlePointerLeave);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+
+			scrollAreaViewport.removeEventListener(
+				EVT_POINTER_ENTER,
+				handlePointerEnter
+			);
+			scrollAreaViewport.removeEventListener(
+				EVT_POINTER_LEAVE,
+				handlePointerLeave
+			);
+		};
+	}, [scrollHideDelay]);
+
+	React.useEffect(() => {
+		const scrollAreaViewport = scrollAreaViewportRef.current;
+
+		if (!scrollAreaViewport) return;
+
+		const handleScroll = (): void => {
+			const {
+				scrollTop,
+				scrollLeft,
+				clientHeight,
+				clientWidth,
+				scrollWidth,
+				scrollHeight,
+			} = scrollAreaViewport;
+			const verticalHeight: number =
+				(clientHeight / scrollHeight) * clientHeight;
+
+			const horizontalWidth: number = (clientWidth / scrollWidth) * clientWidth;
+
+			// setScrollbarY(verticalHeight);
+			setCornerWidth(horizontalWidth);
+			setScrollbarX((scrollLeft / scrollWidth) * clientWidth);
+			setCornerHeight(verticalHeight);
+			setScrollbarY((scrollTop / scrollHeight) * clientHeight);
+		};
+
+		scrollAreaViewport.addEventListener(EVT_SCROLL, handleScroll);
+
+		return () =>
+			scrollAreaViewport.removeEventListener(EVT_SCROLL, handleScroll);
+	}, []);
 
 	// scope
 	const scope = {
+		isMounted,
 		isVisible,
-		handlePointerEnter,
-		handlePointerLeave,
+		scrollbarX,
+		scrollbarY,
+		scrollAreaViewportRef,
 	};
 
 	return (
@@ -79,7 +145,7 @@ export default function ScrollArea({
 				<ScrollAreaViewport>
 					<div className="min-w-full table">{children}</div>
 				</ScrollAreaViewport>
-				<ScrollAreaScrollbar />
+				<ScrollAreaScrollbar reference={scrollAreaScrollbarRef} />
 				<ScrollAreaCorner />
 			</div>
 		</ScrollAreaProvider>
@@ -95,14 +161,20 @@ export function ScrollAreaViewport({
 	...props
 }: ScrollAreaViewportProps) {
 	const { reference: ref } = props;
-	const { handlePointerEnter, handlePointerLeave } = useScrollAreaContext();
+	const { scrollAreaViewportRef } = useScrollAreaContext();
 
 	return (
 		<div
-			ref={ref}
-			onPointerEnter={handlePointerEnter}
-			onPointerLeave={handlePointerLeave}
-			className={cn("h-full w-full rounded-[inherit]", className, {})}
+			ref={ref ?? scrollAreaViewportRef}
+			data-jsx-scroll-area-viewport=""
+			className={cn(
+				"h-full w-full rounded-[inherit] data-[jsx-scroll-area-viewport]:scrollbar-w-none",
+				className,
+				{}
+			)}
+			style={{
+				overflow: "clip scroll",
+			}}
 			{...props}
 		/>
 	);
@@ -121,22 +193,25 @@ export function ScrollAreaScrollbar({
 	...props
 }: ScrollAreaScrollbarProps) {
 	const { reference: ref } = props;
-	const { isVisible } = useScrollAreaContext();
+	const { isMounted, isVisible, scrollbarX, scrollbarY } =
+		useScrollAreaContext();
+	const scrollOffset = orientationProp === "vertical" ? scrollbarY : scrollbarX;
 
 	const inlineStyles: React.CSSProperties =
 		orientationProp === "vertical"
 			? {
 					top: 0,
 					right: 0,
-					bottom: "0px",
+					bottom: `${0}px`,
 			  }
 			: {
 					bottom: 0,
 					left: 0,
-					right: "0px",
+					right: `${scrollbarX}px`,
 			  };
 
 	return (
+		isMounted &&
 		isVisible && (
 			<div
 				ref={ref}
@@ -154,7 +229,6 @@ export function ScrollAreaScrollbar({
 				)}
 				style={{
 					position: "absolute",
-					transform: `translate3d(0px, 241px, 0px)`,
 					...inlineStyles,
 				}}
 				{...props}
@@ -177,17 +251,22 @@ type ScrollAreaThumbProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 export function ScrollAreaThumb({ className, ...props }: ScrollAreaThumbProps) {
 	const { reference: ref } = props;
-	const { isVisible } = useScrollAreaContext();
+	const { isVisible, scrollbarX, scrollbarY } = useScrollAreaContext();
+
+	const scrollOffset = "vertical" === "vertical" ? scrollbarY : scrollbarX;
 
 	return (
 		<span
 			ref={ref}
 			data-jsx-state={getState(isVisible)}
 			className={cn(
-				"block relative flex-1 rounded-full bg-black/10",
+				"inline-block relative flex-1 rounded-full bg-black",
 				className,
 				{}
 			)}
+			style={{
+				transform: `translate3d(0px, ${scrollbarY}px, 0px)`,
+			}}
 			{...props}
 		/>
 	);
