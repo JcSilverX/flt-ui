@@ -5,6 +5,7 @@ import React from "react";
 
 const ScrollAreaProvider = ScrollAreaContext.Provider;
 
+export type TTimeout = NodeJS.Timeout | number;
 export type TDirection = "ltr" | "rtl";
 
 type ScrollAreaProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -43,7 +44,7 @@ export default function ScrollArea({
 	// state
 	const [isVisible, setIsVisible] = React.useState<boolean>(false);
 
-	let timeoutId: NodeJS.Timeout | number = 0;
+	let timeoutId: TTimeout = 0;
 
 	// derived state
 
