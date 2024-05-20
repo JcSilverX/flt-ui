@@ -48,10 +48,17 @@ export default function ScrollArea({
   // state
   const isMounted = useIsMounted();
   const [isVisible, setIsVisible] = React.useState<boolean>(false);
-  const [scrollbarX, setScrollbarX] = React.useState<number | null>(null);
-  const [scrollbarY, setScrollbarY] = React.useState<number | null>(null);
-  const [cornerWidth, setCornerWidth] = React.useState<number>(0);
-  const [cornerHeight, setCornerHeight] = React.useState<number>(0);
+
+  const [scrollbarXEnabled, setScrollbarXEnabled] =
+    React.useState<boolean>(false);
+  const [scrollbarYEnabled, setScrollbarYEnabled] =
+    React.useState<boolean>(false);
+
+  const [thumbHeight, setThumbHeight] = React.useState<number>(0);
+  const [thumbTop, setThumbTop] = React.useState<number>(0);
+  const [thumbWidth, setThumbWidth] = React.useState<number>(0);
+  const [thumbLeft, setThumbLeft] = React.useState<number>(0);
+
   const scrollAreaViewportRef = React.useRef<HTMLDivElement>(null);
   const scrollAreaScrollbarRef = React.useRef<HTMLDivElement>(null);
 
@@ -108,19 +115,22 @@ export default function ScrollArea({
         scrollWidth,
         scrollHeight,
       } = scrollAreaViewport;
-      const verticalHeight: number =
-        (clientHeight / scrollHeight) * clientHeight;
 
-      const horizontalWidth: number = (clientWidth / scrollWidth) * clientWidth;
+      const thumbHeight: number = (clientHeight / scrollHeight) * clientHeight;
+      const thumbTop: number = (scrollTop / scrollHeight) * clientHeight;
 
-      // setScrollbarY(verticalHeight);
-      setCornerWidth(horizontalWidth);
-      setScrollbarX((scrollLeft / scrollWidth) * clientWidth);
-      setCornerHeight(verticalHeight);
-      setScrollbarY((scrollTop / scrollHeight) * clientHeight);
+      setThumbHeight(thumbHeight);
+      setThumbTop(thumbTop);
+
+      const thumbWidth: number = (clientWidth / scrollWidth) * clientWidth;
+      const thumbLeft: number = (scrollLeft / scrollWidth) * clientWidth;
+
+      setThumbWidth(thumbWidth);
+      setThumbLeft(thumbLeft);
     };
 
     scrollAreaViewport.addEventListener(EVT_SCROLL, handleScroll);
+    handleScroll();
 
     return () =>
       scrollAreaViewport.removeEventListener(EVT_SCROLL, handleScroll);
@@ -130,8 +140,15 @@ export default function ScrollArea({
   const scope = {
     isMounted,
     isVisible,
-    scrollbarX,
-    scrollbarY,
+    type,
+    thumbHeight,
+    thumbTop,
+    thumbWidth,
+    thumbLeft,
+    scrollbarXEnabled,
+    setScrollbarXEnabled,
+    scrollbarYEnabled,
+    setScrollbarYEnabled,
     scrollAreaViewportRef,
   };
 
@@ -161,7 +178,8 @@ export function ScrollAreaViewport({
   ...props
 }: ScrollAreaViewportProps) {
   const { reference: ref } = props;
-  const { scrollAreaViewportRef } = useScrollAreaContext();
+  const { scrollAreaViewportRef, scrollbarXEnabled, scrollbarYEnabled } =
+    useScrollAreaContext();
 
   return (
     <div
@@ -173,7 +191,8 @@ export function ScrollAreaViewport({
         {}
       )}
       style={{
-        overflow: "clip scroll",
+        overflowX: scrollbarXEnabled ? "scroll" : "clip",
+        overflowY: scrollbarYEnabled ? "scroll" : "clip",
       }}
       {...props}
     />
@@ -193,22 +212,35 @@ export function ScrollAreaScrollbar({
   ...props
 }: ScrollAreaScrollbarProps) {
   const { reference: ref } = props;
-  const { isMounted, isVisible, scrollbarX, scrollbarY } =
-    useScrollAreaContext();
-  const scrollOffset = orientationProp === "vertical" ? scrollbarY : scrollbarX;
+  const {
+    isMounted,
+    isVisible,
+    type,
+    thumbHeight: height,
+    thumbWidth: width,
+    setScrollbarXEnabled,
+    setScrollbarYEnabled,
+  } = useScrollAreaContext();
+  const isHorizontal = orientationProp === "horizontal";
 
-  const inlineStyles: React.CSSProperties =
-    orientationProp === "vertical"
-      ? {
-          top: 0,
-          right: 0,
-          bottom: `${0}px`,
-        }
-      : {
-          bottom: 0,
-          left: 0,
-          right: `${scrollbarX}px`,
-        };
+  const inlineStyles: React.CSSProperties = isHorizontal
+    ? {
+        bottom: 0,
+        left: 0,
+        right: `${width}px`,
+      }
+    : {
+        top: 0,
+        right: 0,
+        bottom: `${height}px`,
+      };
+
+  React.useEffect(() => {
+    isHorizontal ? setScrollbarXEnabled(true) : setScrollbarYEnabled(true);
+
+    return () =>
+      isHorizontal ? setScrollbarXEnabled(false) : setScrollbarYEnabled(false);
+  }, [isHorizontal, setScrollbarXEnabled, setScrollbarYEnabled]);
 
   return (
     isMounted &&
@@ -233,7 +265,7 @@ export function ScrollAreaScrollbar({
         }}
         {...props}
       >
-        <ScrollAreaThumb />
+        <ScrollAreaThumb orientation={orientationProp} />
       </div>
     )
   );
@@ -247,13 +279,33 @@ export function ScrollAreaCorner({ className, ...props }: ScrollAreaProps) {
 
 type ScrollAreaThumbProps = React.HTMLAttributes<HTMLSpanElement> & {
   reference?: React.RefObject<HTMLSpanElement> | undefined;
+  orientation?: TOrientation | undefined;
 };
 
-export function ScrollAreaThumb({ className, ...props }: ScrollAreaThumbProps) {
+export function ScrollAreaThumb({
+  orientation,
+  className,
+  ...props
+}: ScrollAreaThumbProps) {
   const { reference: ref } = props;
-  const { isVisible, scrollbarX, scrollbarY } = useScrollAreaContext();
+  const {
+    isVisible,
+    thumbHeight: height,
+    thumbTop: top,
+    thumbWidth: width,
+    thumbLeft: left,
+  } = useScrollAreaContext();
 
-  const scrollOffset = "vertical" === "vertical" ? scrollbarY : scrollbarX;
+  const inlineStyles: React.CSSProperties =
+    orientation === "vertical"
+      ? {
+          transform: `translate3d(0px, ${top}px, 0px)`,
+          height: `${height}px`,
+        }
+      : {
+          transform: `translate3d(${left}px, 0px, 0px)`,
+          width: `${width}px`,
+        };
 
   return (
     <span
@@ -265,7 +317,7 @@ export function ScrollAreaThumb({ className, ...props }: ScrollAreaThumbProps) {
         {}
       )}
       style={{
-        transform: `translate3d(0px, ${scrollbarY}px, 0px)`,
+        ...inlineStyles,
       }}
       {...props}
     />
