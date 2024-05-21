@@ -1,18 +1,21 @@
+import React from "react";
 import ScrollAreaContext from "@/context/scroll-area-context-provider";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 import useIsMounted from "@/lib/hooks/use-is-mounted";
 import useScrollAreaContext from "@/lib/hooks/use-scroll-area-context";
 import { clamp } from "@/lib/utils/clamp";
 import cn from "@/lib/utils/cn";
-import React from "react";
 
 const ScrollAreaProvider = ScrollAreaContext.Provider;
-const EVT_POINTER_ENTER = "pointerenter";
-const EVT_POINTER_LEAVE = "pointerleave";
-const EVT_SCROLL = "scroll";
-export type TPointerEvent = React.PointerEvent<HTMLDivElement>;
 
+export const EVT_POINTER_ENTER = "pointerenter";
+export const EVT_POINTER_LEAVE = "pointerleave";
+export const EVT_SCROLL = "scroll";
+
+export type TPointerEvent = React.PointerEvent<HTMLDivElement>;
 export type TTimeout = NodeJS.Timeout | number;
 export type TDirection = "ltr" | "rtl";
+export type TOrientation = "horizontal" | "vertical";
 
 type ScrollAreaProps = React.HTMLAttributes<HTMLDivElement> & {
 	reference?: React.RefObject<HTMLDivElement> | undefined;
@@ -36,12 +39,17 @@ type ScrollAreaProps = React.HTMLAttributes<HTMLDivElement> & {
 	 * The reading direction of the scroll area. If omitted, inherits globally from DirectionProvider or assumes LTR (left-to-right) reading mode.
 	 */
 	dir?: TDirection | undefined;
+	/**
+	 * The orientation of the scrollbar
+	 */
+	orientation?: TOrientation | undefined;
 };
 
 export default function ScrollArea({
 	type = "hover",
 	scrollHideDelay = 600,
 	dir = "ltr",
+	orientation = "vertical",
 	className,
 	...props
 }: ScrollAreaProps) {
@@ -109,8 +117,12 @@ export default function ScrollArea({
 
 		if (scrollbarYEnabled) {
 			setThumbTop(clampedPosition);
+			const newScrollTop = (clampedPosition / viewportSize) * scrollSize;
+			scrollAreaViewport.scrollTop = newScrollTop;
 		} else {
 			setThumbLeft(clampedPosition);
+			const newScrollLeft = (clampedPosition / viewportSize) * scrollSize;
+			scrollAreaViewport.scrollLeft = newScrollLeft;
 		}
 
 		evt.preventDefault();
@@ -203,6 +215,7 @@ export default function ScrollArea({
 		isMounted,
 		isVisible,
 		type,
+		orientation,
 		thumbHeight,
 		thumbTop,
 		thumbWidth,
@@ -212,6 +225,7 @@ export default function ScrollArea({
 		scrollbarYEnabled,
 		setScrollbarYEnabled,
 		scrollAreaViewportRef,
+		scrollAreaScrollbarRef,
 		handlePointerDown,
 		handlePointerMove,
 		handlePointerUp,
@@ -228,10 +242,7 @@ export default function ScrollArea({
 				<ScrollAreaViewport>
 					<div className="min-w-full table">{children}</div>
 				</ScrollAreaViewport>
-				<ScrollAreaScrollbar
-					reference={scrollAreaScrollbarRef}
-					orientation="horizontal"
-				/>
+				<ScrollAreaScrollbar />
 				<ScrollAreaCorner />
 			</div>
 		</ScrollAreaProvider>
@@ -268,23 +279,21 @@ export function ScrollAreaViewport({
 	);
 }
 
-type TOrientation = "horizontal" | "vertical";
-
 type ScrollAreaScrollbarProps = React.HTMLAttributes<HTMLDivElement> & {
 	reference?: React.RefObject<HTMLDivElement> | undefined;
-	orientation?: TOrientation | undefined;
 };
 
 export function ScrollAreaScrollbar({
-	orientation: orientationProp = "vertical",
 	className,
 	...props
 }: ScrollAreaScrollbarProps) {
 	const { reference: ref } = props;
 	const {
+		scrollAreaScrollbarRef,
 		isMounted,
 		isVisible,
 		type,
+		orientation: orientationProp,
 		thumbHeight: height,
 		thumbWidth: width,
 		setScrollbarXEnabled,
@@ -316,32 +325,34 @@ export function ScrollAreaScrollbar({
 	}, [isHorizontal, setScrollbarXEnabled, setScrollbarYEnabled]);
 
 	return (
-		<div
-			ref={ref}
-			daa-jsx-orientation={orientationProp}
-			data-jsx-state={getState(isVisible)}
-			onPointerDown={handlePointerDown}
-			onPointerMove={handlePointerMove}
-			onPointerUp={handlePointerUp}
-			onPointerCancel={handlePointerCancel}
-			className={cn(
-				"flex touch-none select-none transition-colors",
-				className,
-				{
-					"h-full w-2.5 border-l border-l-transparent p-[.0625rem]":
-						orientationProp === "vertical",
-					"h-2.5 flex-col border-t border-t-transparent p-[.0625rem]":
-						orientationProp === "horizontal",
-				}
-			)}
-			style={{
-				position: "absolute",
-				...inlineStyles,
-			}}
-			{...props}
-		>
-			<ScrollAreaThumb orientation={orientationProp} />
-		</div>
+		isMounted && (
+			<div
+				ref={ref ?? scrollAreaScrollbarRef}
+				data-jsx-orientation={orientationProp}
+				data-jsx-state={getState(isVisible)}
+				onPointerDown={handlePointerDown}
+				onPointerMove={handlePointerMove}
+				onPointerUp={handlePointerUp}
+				onPointerCancel={handlePointerCancel}
+				className={cn(
+					"flex touch-none select-none transition-colors",
+					className,
+					{
+						"h-full w-2.5 border-l border-l-transparent p-[.0625rem]":
+							orientationProp === "vertical",
+						"h-2.5 flex-col border-t border-t-transparent p-[.0625rem]":
+							orientationProp === "horizontal",
+					}
+				)}
+				style={{
+					position: "absolute",
+					...inlineStyles,
+				}}
+				{...props}
+			>
+				<ScrollAreaThumb orientation={orientationProp} />
+			</div>
+		)
 	);
 }
 
