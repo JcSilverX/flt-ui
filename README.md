@@ -33,7 +33,7 @@
 - Progress
 - Radio Group
 - Resizable
-- Scroll Area
+- Scroll Area ✔
 - Select
 - Separator ✔
 - Sheet
