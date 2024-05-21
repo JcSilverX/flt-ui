@@ -397,7 +397,7 @@ export function ScrollAreaThumb({
 			ref={ref}
 			data-jsx-state={getState(isVisible)}
 			className={cn(
-				"inline-block relative flex-1 rounded-full bg-black",
+				"inline-block relative flex-1 rounded-full bg-black/10",
 				className,
 				{}
 			)}
