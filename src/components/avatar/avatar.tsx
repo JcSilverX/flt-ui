@@ -174,7 +174,7 @@ export function useImageLoadingStatus(src?: string | undefined) {
 
 		return () => {
 			setIsMounted(false);
-			console.log(isMounted);
+
 			image.removeEventListener("load", updateStatus("loaded"));
 			image.removeEventListener("error", updateStatus("error"));
 		};
