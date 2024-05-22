@@ -13,4 +13,3 @@ type TAvatarContext = {
 const AvatarContext = createContext<TAvatarContext | null>(null);
 
 export default AvatarContext;
-// const setImageLoadingStatus: React.Dispatch<React.SetStateAction<ImageLoadingStatus>>
