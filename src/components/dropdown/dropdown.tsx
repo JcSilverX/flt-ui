@@ -34,7 +34,7 @@ export default function Dropdown({
 	...props
 }: DropdownProps) {
 	// state
-	const { isMounted } = useIsMounted();
+	const isMounted = useIsMounted();
 	const [isOpen, setIsOpen] = React.useState<boolean>(false);
 	const dropdownTriggerRef = React.useRef<HTMLButtonElement>(null);
 	const dropdownMenuRef = React.useRef<HTMLDivElement>(null);

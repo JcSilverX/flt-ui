@@ -9,5 +9,5 @@ export default function useIsMounted() {
 
 	React.useEffect(() => setIsMounted(true), []);
 
-	return { isMounted, setIsMounted };
+	return isMounted;
 }

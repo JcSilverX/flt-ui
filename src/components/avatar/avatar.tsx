@@ -151,14 +151,13 @@ export function useImageLoadingStatus(src?: string | undefined) {
 	const [loadingStatus, setLoadingStatus] =
 		React.useState<ImageLoadingStatus>("idle");
 
-	const { isMounted, setIsMounted } = useIsMounted();
-
 	React.useEffect(() => {
 		if (!src) {
 			setLoadingStatus("error");
 			return;
 		}
 
+		let isMounted: boolean = true;
 		const image = new Image();
 		setLoadingStatus("loading");
 
@@ -173,12 +172,12 @@ export function useImageLoadingStatus(src?: string | undefined) {
 		image.src = src;
 
 		return () => {
-			setIsMounted(false);
+			isMounted = false;
 
 			image.removeEventListener("load", updateStatus("loaded"));
 			image.removeEventListener("error", updateStatus("error"));
 		};
-	}, [isMounted, setIsMounted, src]);
+	}, [src]);
 
 	return loadingStatus;
 }
